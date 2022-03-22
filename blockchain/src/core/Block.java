@@ -45,6 +45,7 @@ public class Block {
     public ArrayList<Transaction> getTXList() {
         return this.merkle_tree.getTXList();
     }
+    public String getMerkleRoot() {return merkle_root;}
     public int getTimestamp() {return timestamp;}
     
 

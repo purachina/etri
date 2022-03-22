@@ -6,27 +6,41 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.ArrayList;
 import core.Block;
 import core.Transaction;
 
-public class Network {
-    private ArrayList<String> node_ip_and_stat_list;
-
+public class Communicate {
+    protected static ArrayList<String> full_node;
+    protected static ArrayList<String> light_node;
+    public Communicate(String server_ip, String full_or_light) {
+        full_node = new ArrayList<String>();
+        light_node = new ArrayList<String>();
+        full_node.add("full");
+        light_node.add("light");
+        connectInit(server_ip, full_or_light);
+    }
     // client func sets gonna be used in Network() constructor and
     // may use only once(when program starts)
-    private int noticeType(Socket socket, boolean is_full_node) {
+    private int noticeType(Socket socket, Boolean is_full_node) {
         try {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream());
-            if (is_full_node) pw.print("full");
-            else pw.print("light");
-            pw.flush();
-            pw.close();
+            if (is_full_node.equals("full") || is_full_node.equals("light")) {
+                PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                pw.print(is_full_node);
+                pw.flush();
+                pw.close();
+            }
+            else {
+                return 1;
+            }
             return 0;
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -78,30 +92,30 @@ public class Network {
         }
         return 1;
     }
-    private int connectInit(String server_ip, boolean is_full_node) {
-        // receive whole node's ip list and whole blockchain and hash from manager node
-        SocketAddress sock_addr = new InetSocketAddress(server_ip, 55555);
-        Socket socket = new Socket();
-        try {
-            socket.setSoTimeout(10000);
-            socket.connect(sock_addr, 5000);
-            noticeType(socket, is_full_node);
-            if (is_full_node) recvBlockchain(socket);
-            else recvHash(socket);
-            recvNodeList(socket);
-            socket.close();
-        }
-        catch (IOException e) {e.printStackTrace();}
-        return 0;
-    }
 
 
     // consensus, transaction distribution, etc 
+    private boolean PoW(int recv_nonce, String recv_block_hash, Block my_block) {
+        String my_hash =
+        Hashing.getHash(my_block.getPreBlockHash() + recv_nonce + my_block.getMerkleRoot() + my_block.getTimestamp());
+        if (my_hash.equals(recv_block_hash) && 
+        my_hash.substring(
+            0, my_block.getDifficulty().length()
+        ).
+        compareTo(my_block.getDifficulty()) <= 0) {
+            return true;
+        }
+        return false;
+    }
 
-    private int sendSomething(Socket socket, Object o) {
+    protected static int sendSomething(Socket socket, Object o) {
         try {
             if ((o instanceof Block) || o instanceof Transaction ||
             o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block) {
+                PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                pw.print("sending object");
+                pw.flush();
+                pw.close();
                 ObjectOutputStream oos =
                 new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(o);
@@ -118,116 +132,109 @@ public class Network {
         }
         return 1;
     }
-    public int distributeObjToNetwork(Object o) {
+    // Distribution something on P2P network
+    private class DOONThread implements Runnable {
+        private String ip;
+        private Object o;
+        public DOONThread(String ip, Object o) {
+            this.ip = ip;
+            this.o = o;
+        }
+        @Override
+        public void run() {
+            SocketAddress sock_addr = new InetSocketAddress(ip, 55555);
+            Socket socket = new Socket();
+            try {
+                socket.setSoTimeout(10000);
+                socket.connect(sock_addr, 5000);
+                if (sendSomething(socket, o) != 0) {
+                    System.out.println("Distributing Error!!!");
+                }
+                socket.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    public int distributeObjOnNetwork(Object o) {
         for (int i = 0; i < node_ip_and_stat_list.size(); i+=2) {
             if (node_ip_and_stat_list.get(i + 1).equals("full")) {
-                new Thread() {
-                    public void run() {
-                        String addr = new String(node_ip_and_stat_list.get(i));
-                        SocketAddress sock_addr =
-                        new InetSocketAddress(
-                            addr, 55555
-                        );
-                        Socket socket = new Socket();
-                        try {
-                            socket.setSoTimeout(10000);
-                            socket.connect(sock_addr, 5000);
-                            sendSomething(socket, o);
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }   
-                }.start();
+                Thread t = new Thread(
+                    new DOONThread(
+                        node_ip_and_stat_list.get(i), o
+                    )
+                );
+                t.start();
             }
         }
         return 0;
     }
-    private ArrayList<Object> recvSomething() { // run as much as cnt of nodes
-        ServerSocket server_sock;
-        try {
-            server_sock = new ServerSocket(55556);
-            while (true) {
-                try (Socket socket = server_sock.accept()) {
-                    if (!handshaking(false, socket)) socket.close();
-                    else {
-                        ObjectInputStream ois = new ObjectInputStream(
-                            socket.getInputStream()
-                        );
-                        Object recv_item = ois.readObject();
-                        String recv_type = "";
-                        server_sock.close();
-                        if (recv_item instanceof Block) recv_type = "Block";
-                        else if (recv_item instanceof Transaction) {
-                            recv_type = "Transaction";
-                        }
-                        else if (recv_item instanceof ArrayList &&
-                        ((ArrayList) recv_item).get(0) instanceof Block) {
-                            recv_type = "Blockchain";
-                        }
-                        else return null;
-                        
-                        ArrayList<Object> ret = new ArrayList<Object>();
-                        ret.add(recv_type);
-                        ret.add(recv_item);
-                        return ret;
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+    private class ROFNThread implements Runnable {
+        private Object recv_item;
+
+    }
+    protected static Object recvSomething(Socket socket) {
+        while (true) {
+            try {
+                ObjectInputStream ois = new ObjectInputStream(
+                        socket.getInputStream());
+                Object recv_item = ois.readObject();
+                return recv_item;
+            } catch (IOException | ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
+        }
+    }
+    protected static String handshaking(Socket socket) {
+        try {
+            PrintWriter pw = new PrintWriter(socket.getOutputStream());
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(
+                    socket.getInputStream()
+                )
+            );
+            String ans = null;
+            if (br.readLine().equals("asdf")) {
+                pw.print("OK");
+                pw.flush();
+                ans = br.readLine();
+            }
+            pw.close();
+            br.close();
+            return ans;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
     }
-    private boolean handshaking(boolean is_sender, Socket socket) {
-        if (is_sender) {
-            try {
-                PrintWriter pw = new PrintWriter(socket.getOutputStream());
-                pw.print("asdf");
+    protected static String handshaking(Socket socket, String tar) {
+        try {
+            PrintWriter pw = new PrintWriter(socket.getOutputStream());
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(
+                    socket.getInputStream()
+                )
+            );
+            pw.print("asdf");
+            pw.flush();
+            if (br.readLine().equals("OK")) {
+                pw.print(tar);
                 pw.flush();
-                pw.close();
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(
-                        socket.getInputStream()
-                    )
-                );
-                String ans = br.readLine();
-                br.close();
-                if (ans.equals("zxcv")) return true;
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
+            pw.close();
+            br.close();
+            return "OK";
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        else {
-            try {
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(
-                        socket.getInputStream()
-                    )
-                );
-                String ans = br.readLine();
-                br.close();
-                if (ans.equals("asdf")) {
-                    PrintWriter pw = new PrintWriter(socket.getOutputStream());
-                    pw.print("zxcv");
-                    pw.flush();
-                    pw.close();
-                }
-                else return false;
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        return false;
+        return tar;
     }
     // server func sets gonna be used in main()
-    private String isFullClient(Socket client_sock) {
+    protected static String isFullClient(Socket client_sock) {
         // checking that the node is lightweight type or full type
         try {
             BufferedReader br = new BufferedReader(
@@ -297,27 +304,39 @@ public class Network {
             server_sock = new ServerSocket(55555);
             while (true) {
                 try (Socket client_sock = server_sock.accept()) {
+                    SocketMng(client_sock);
                     // get external ip (Should gonna be test!)
                     String new_peer_addr =
-                    (
-                        (InetSocketAddress)client_sock.getRemoteSocketAddress()
-                    ).getAddress().getHostAddress();
+                    ((InetSocketAddress)client_sock.getRemoteSocketAddress()).getAddress().getHostAddress();
                     
 
-                    String nodechk = isFullClient(client_sock);
-                    if (nodechk.equals("full") || nodechk.equals("light")) {
-                        if (nodechk.equals("full")) {
+                    String chk = isFullClient(client_sock);
+                    if (chk.equals("full") || nodechk.equals("light")) {
+                        if (chk.equals("full")) {
                             sendBlockchain(blockchain, client_sock);
                         }
-                        else if (nodechk.equals("light")) {
+                        else if (chk.equals("light")) {
                             sendHash(Hashing.getHash(blockchain), client_sock);
                         }
                         if (this.node_ip_and_stat_list.indexOf(new_peer_addr) ==
                         -1) {
                             this.node_ip_and_stat_list.add(new_peer_addr);
-                            this.node_ip_and_stat_list.add(nodechk);
+                            this.node_ip_and_stat_list.add(chk);
                         }
                         sendNodeList(client_sock);
+                    }
+                    else if (chk.equals("sending object")) {
+                        for (int i = 0; i < node_ip_and_stat_list.size() - 2;
+                        i += 2) {
+                            new Thread() {
+                                public void run() {
+                                    ServerSocket ss = new ServerSocket(55555);
+                                    while (true) {
+                                        
+                                    }
+                                }   
+                            }.start();
+                        }
                     }
                     else client_sock.close();
 
