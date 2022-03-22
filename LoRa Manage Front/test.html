@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src = "https:d3js.org/d3.v5.min.js"></script>
+    </head>
+    <body>
+        <svg width="350px" height="350px"></svg>
+        <script>
+            const data = [
+                {node : 1, renewed_time : new Date("2022-03-22T09:32:22")},
+                {node : 2, renewed_time : new Date("2022-03-21T11:32:11")},
+                {node : 3, renewed_time : new Date("2022-03-21T21:48:41")},
+                {node : 4, renewed_time : new Date("2022-03-21T18:02:08")},
+                {node : 5, renewed_time : new Date("2022-03-21T12:51:45")},
+                {node : 6, renewed_time : new Date("2022-03-22T08:58:12")}
+            ];
+
+            const xscale = d3.scaleTime().
+            domain(
+                [new Date("2022-03-21T00:00:00"), new Date("2022-03-22T23:59:59")]
+                ).
+            range([20, 330]);
+            
+            const yscale = d3.scaleLinear().
+            domain([1, 9]).
+            range([330, 20]);
+
+            const x_axis_svg =
+            d3.
+            select("svg").
+            append("g").
+            attr("transform", "translate(0, 330)");
+            const y_axis_svg = d3.select("svg").append("g");
+
+            const x_axis = d3.axisBottom(xscale).tickSize(10).ticks(10);
+            const y_axis = d3.axisRight(yscale).tickSize(10).ticks(10);
+            x_axis(x_axis_svg);
+            y_axis(y_axis_svg);
+        </script>
+    </body>
+</html>

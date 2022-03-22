@@ -1,6 +1,7 @@
 package core;
 
 import java.io.Serializable;
+import util.Network;
 
 public class Transaction implements Serializable{
     String payer, payee;
@@ -28,6 +29,7 @@ public class Transaction implements Serializable{
     public Transaction add(Transaction new_tx) {
         String tmpPayer, tmpPayee;
         double tmpAmount;
+        Network.sendSomething();
         tmpPayer = this.payer + new_tx.getPayer();
         tmpPayee = this.payee + new_tx.getPayee();
         tmpAmount = this.amount + new_tx.getAmount();

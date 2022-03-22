@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import core.Block;
 import core.Transaction;
@@ -97,20 +98,15 @@ public class Network {
 
     // consensus, transaction distribution, etc 
 
-    private int sendSomething(String recv_ip, Object o) {
-        SocketAddress sock_addr = new InetSocketAddress(recv_ip, 55556);
-        Socket socket = new Socket();
+    private int sendSomething(Socket socket, Object o) {
         try {
             if ((o instanceof Block) || o instanceof Transaction ||
             o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block) {
-                socket.setSoTimeout(10000);
-                socket.connect(sock_addr, 5000);
                 ObjectOutputStream oos =
                 new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(o);
                 oos.flush();
                 oos.close();
-                socket.close();
                 return 0;
             }
             else {
@@ -122,8 +118,32 @@ public class Network {
         }
         return 1;
     }
-    private ArrayList<Object> recvSomething(Socket socket) {
-        if (socket.equals(null)) ; // 추가추가추가추가
+    public int distributeObjToNetwork(Object o) {
+        for (int i = 0; i < node_ip_and_stat_list.size(); i+=2) {
+            if (node_ip_and_stat_list.get(i + 1).equals("full")) {
+                new Thread() {
+                    public void run() {
+                        String addr = new String(node_ip_and_stat_list.get(i));
+                        SocketAddress sock_addr =
+                        new InetSocketAddress(
+                            addr, 55555
+                        );
+                        Socket socket = new Socket();
+                        try {
+                            socket.setSoTimeout(10000);
+                            socket.connect(sock_addr, 5000);
+                            sendSomething(socket, o);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }   
+                }.start();
+            }
+        }
+        return 0;
+    }
+    private ArrayList<Object> recvSomething() { // run as much as cnt of nodes
         ServerSocket server_sock;
         try {
             server_sock = new ServerSocket(55556);
@@ -292,7 +312,8 @@ public class Network {
                         else if (nodechk.equals("light")) {
                             sendHash(Hashing.getHash(blockchain), client_sock);
                         }
-                        if (this.node_ip_and_stat_list.indexOf(new_peer_addr) == -1) {
+                        if (this.node_ip_and_stat_list.indexOf(new_peer_addr) ==
+                        -1) {
                             this.node_ip_and_stat_list.add(new_peer_addr);
                             this.node_ip_and_stat_list.add(nodechk);
                         }
@@ -310,12 +331,5 @@ public class Network {
             e.printStackTrace();
         }
         return 0;
-    }
-
-
-    public Network(ArrayList<String> mngr_node_list, boolean is_full_node) {
-        for (int i = 0; i < mngr_node_list.size(); i++) {
-            connectInit(mngr_node_list.get(i), is_full_node);
-        }
     }
 }
