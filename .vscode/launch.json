@@ -1,0 +1,36 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "etri_800a6373"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
+            "mainClass": "com.abcd.App",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "Launch BlockChain",
+            "request": "launch",
+            "mainClass": "core.BlockChain",
+            "projectName": "etri_800a6373",
+            "vmArgs": "-Djava.library.path=C:\\Users\\Intern04\\Desktop\\etri\\blockchain\\lib\\rxtx-2.1-7-bins-r2\\Windows\\i368-mingw32\\"
+        }
+    ]
+}

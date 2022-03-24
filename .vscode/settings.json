@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "blockchain/lib/rxtx-2.1-7-bins-r2/RXTXcomm.jar"
+    ]
+}

@@ -1,38 +1,45 @@
 package core;
 
 import java.io.Serializable;
-import util.Communicate;
+import core.Atom.TXString;
 
 public class Transaction implements Serializable{
-    String payer, payee;
-    double amount;
     
-    public Transaction(String payer, String payee, double amount) {
-        this.payer = payer;
-        this.payee = payee;
-        this.amount = amount;
+    TXString payer, payee, amount;
+    
+    public Transaction(String payer, String payee, String amount) {
+        this.payer = new TXString();
+        this.payee = new TXString();
+        this.amount = new TXString();
+        this.setPayer(payer);
+        this.setPayee(payee);
+        this.setAmount(amount);
     }
     public Transaction() {
-        this.payer = "Advanced Secured Decentralized Facility";
-        this.payee = "Designed by Purachina";
-        this.amount = 0.0;
+        this.setPayer("Advanced Secured Decentralized Facility");
+        this.setPayee("Designed by Purachina");
+        this.setAmount("0");
     }
-    public void setPayer(String payer) {this.payer = payer;}
-    public String getPayer() {return this.payer;}
-    public void setPayee(String payee) {this.payee = payee;}
-    public String getPayee() {return this.payee;}
-    public void setAmount(double amount) {this.amount = amount;}
-    public double getAmount() {return this.amount;}
+    public Transaction getTXCopy() {
+        Transaction tmptx = new Transaction(this.getPayer(), this.getPayee(), this.getAmount());
+        return tmptx;
+    }
+    private void setPayer(String payer) {this.payer.txstring = payer;}
+    protected String getPayer() {return this.payer.txstring;}
+    private void setPayee(String payee) {this.payee.txstring = payee;}
+    protected String getPayee() {return this.payee.txstring;}
+    private void setAmount(String amount) {this.amount.txstring = amount;}
+    protected String getAmount() {return this.amount.txstring;}
+    public String getPayerCopy() {
+        return new String(this.payer.txstring);
+    }
+    public String getPayeeCopy() {
+        return new String(this.payee.txstring);
+    }
+    public String getAmountCopy() {
+        return new String(this.amount.txstring);
+    }
     public String getInfo() {
-        return this.payer + " sends " + this.amount + "BTC to " + this.payee;
-    }
-    public Transaction add(Transaction new_tx) {
-        String tmpPayer, tmpPayee;
-        double tmpAmount;
-        Communicate.sendSomething();
-        tmpPayer = this.payer + new_tx.getPayer();
-        tmpPayee = this.payee + new_tx.getPayee();
-        tmpAmount = this.amount + new_tx.getAmount();
-        return new Transaction(tmpPayer, tmpPayee, tmpAmount);
+        return new String(this.payer.txstring + " sends " + this.amount.txstring + "BTC to " + this.payee.txstring);
     }
 }

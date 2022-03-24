@@ -1,54 +1,35 @@
 package core;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.util.*;
-import util.Communicate;
+import util.Init;
 public class BlockChain {
-    public static Block Cblock;
+    public static Block cblock;
     public static ArrayList<Block> blockchain;
-    private static Communicate net;
-    private static int init() {
-        while (true) {
-            System.out.println("Where is server?");
-            Scanner sc = new Scanner(System.in);
-            String server_addr = sc.nextLine();
-            System.out.println("Are you full node or light node?");
-            String full_or_light = sc.nextLine();
-            if (full_or_light.equals("full") || full_or_light.equals("light")) {
-                System.out.println("try again");
+    public static int setBlockchain(ArrayList<Block> nbc) {
+        synchronized(blockchain) {
+            ArrayList<Block> tmpbc = new ArrayList<Block>();
+            for (int i = 0; i < nbc.size(); i++) {
+                tmpbc.add(new Block(nbc.get(i)));
             }
-            else {
-                net = new Communicate(server_addr, full_or_light);
-                break;
-            }
+            blockchain = tmpbc;
         }
-        return 1;
+        return 0;
     }
     public static void main (String[] args) {
         Scanner sc = new Scanner(System.in);
+        //System.out.println("Where is server?");
+        //chkInit.execInit(sc.nextLine());
         blockchain = new ArrayList<Block>();
         blockchain.add(new Block());
-        Cblock = blockchain.get(blockchain.size() - 1);
-        init();
+        cblock = blockchain.get(blockchain.size() - 1);
         new Thread() {
             public void run() {
                 while (true) {
-                    blockchain.add(Cblock.mine());
-                    Cblock = blockchain.get(blockchain.size() - 1);
+                    blockchain.add(cblock.mine());
+                    cblock = blockchain.get(blockchain.size() - 1);
+                    
                 }
             }   
-        }.start();
-
-        ServerSocket server_sock = new ServerSocket(55555);
-        new Thread() {
-            public void run() {
-                
-            }
         }.start();
         new Thread() {
             public void run() {
@@ -73,7 +54,7 @@ public class BlockChain {
                         amount = sc.nextDouble();
                         Transaction tx = new Transaction(payer, payee, amount);
                         tx.getInfo();
-                        Cblock.addTX(tx);
+                        cblock.addTX(tx);
                         for (int i = 0; i < blockchain.size(); i++) {
                             blockchain.get(i).getBlockInfo();
                         }
