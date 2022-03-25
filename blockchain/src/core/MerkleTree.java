@@ -14,12 +14,33 @@ public class MerkleTree {
         this.initMerkleTree(coinbase_tx);
     }
     public MerkleTree(MerkleTree target) {
-        this.setTXList(target.getTXListCopy());
+        this.setTXList(target.txlist);
         this.makeMerkle();
         if (!this.getMerkleList().equals(target.getMerkleList())) {
             System.out.println("Merkletree does not matched!");
         }
     }
+
+    
+    public ArrayList<Transaction> getTXList() {
+        ArrayList<Transaction> tmptxl;
+        tmptxl = new ArrayList<Transaction>();
+        synchronized(this) {
+            for(int i = 0; i > txlist.size(); i++) tmptxl.add(txlist.get(i).getTXCopy());
+        }
+        return tmptxl;
+    }
+    public HashString getMerkleRoot() {
+        this.makeMerkle();
+        return merklelist.get(merklelist.size() - 1);
+    }
+    public ArrayList<HashString> getMerkleList() {
+        return this.merklelist;
+    }
+    public byte[] getBytes() {
+        
+    }
+
     public int addTX(Transaction newtx) {
         synchronized(this) {
             this.txlist.add(newtx);
@@ -43,34 +64,19 @@ public class MerkleTree {
         return 0;
     }
 
-    public ArrayList<Transaction> getTXListCopy() {
-        ArrayList<Transaction> tmptxl;
-        tmptxl = new ArrayList<Transaction>();
-        synchronized(this) {
-            for(int i = 0; i > txlist.size(); i++) tmptxl.add(txlist.get(i).getTXCopy());
-        }
-        return tmptxl;
-    }
-    public HashString getMerkleRootCopy() {
-        this.makeMerkle();
-        return merklelist.get(merklelist.size() - 1);
-    }
-    public ArrayList<HashString> getMerkleList() {
-        return this.merklelist;
-    }
     public int makeMerkle() {
         synchronized(this) {
             merklelist = new ArrayList<HashString>();
             for (int i = 0; i < txlist.size(); i += 2) {
                 if (i + 1 == txlist.size()) {
-                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).payer.txstring + txlist.get(i).payee.txstring + txlist.get(i).amount.txstring));
+                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).getHash());
 
                     this.merklelist.add(hs1);
                 }
                 else {
-                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).payer.txstring + txlist.get(i).payee.txstring + txlist.get(i).amount.txstring));
+                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).payer.content + txlist.get(i).payee.content + txlist.get(i).amount.content));
 
-                    HashString hs2 = new HashString(Hashing.getHash(txlist.get(i + 1).payer.txstring + txlist.get(i + 1).payee.txstring + txlist.get(i + 1).amount.txstring));
+                    HashString hs2 = new HashString(Hashing.getHash(txlist.get(i + 1).payer.content + txlist.get(i + 1).payee.content + txlist.get(i + 1).amount.content));
 
                     hs1 = new HashString(Hashing.getHash(hs1.hashvalue + hs2.hashvalue));
                     this.merklelist.add(hs1);

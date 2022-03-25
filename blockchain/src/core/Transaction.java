@@ -1,7 +1,10 @@
 package core;
 
 import java.io.Serializable;
+
+import core.Atom.HashString;
 import core.Atom.TXString;
+import util.Hashing;
 
 public class Transaction implements Serializable{
     
@@ -24,22 +27,20 @@ public class Transaction implements Serializable{
         Transaction tmptx = new Transaction(this.getPayer(), this.getPayee(), this.getAmount());
         return tmptx;
     }
-    private void setPayer(String payer) {this.payer.txstring = payer;}
-    protected String getPayer() {return this.payer.txstring;}
-    private void setPayee(String payee) {this.payee.txstring = payee;}
-    protected String getPayee() {return this.payee.txstring;}
-    private void setAmount(String amount) {this.amount.txstring = amount;}
-    protected String getAmount() {return this.amount.txstring;}
-    public String getPayerCopy() {
-        return new String(this.payer.txstring);
-    }
-    public String getPayeeCopy() {
-        return new String(this.payee.txstring);
-    }
-    public String getAmountCopy() {
-        return new String(this.amount.txstring);
-    }
+    public String getPayer() {return this.payer.toString();}
+    public String getPayee() {return this.payee.toString();}
+    public String getAmount() {return this.amount.toString();}
     public String getInfo() {
-        return new String(this.payer.txstring + " sends " + this.amount.txstring + "BTC to " + this.payee.txstring);
+        return new String(this.payer.toString() + " sends " + this.amount.toString() + "BTC to " + this.payee.toString());
     }
+    public HashString getHash() {
+        HashString ret = new HashString(Hashing.getHash(payer.getHash().toString() + payee.getHash().toString() + amount.getHash().toString()));
+        return ret;
+    }
+    protected TXString getPayerOrg() {return this.payer;}
+    protected TXString getPayeeOrg() {return this.payee;}
+    protected TXString getAmountOrg() {return this.amount;}
+    private void setPayer(String payer) {this.payer.content = payer;}
+    private void setPayee(String payee) {this.payee.content = payee;}
+    private void setAmount(String amount) {this.amount.content = amount;}    
 }

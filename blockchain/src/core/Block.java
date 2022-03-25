@@ -20,75 +20,71 @@ public class Block implements Serializable {
         this.difficulty = "0";
         this.timestamp = 0;
     }
-    public Block(Block preblock, int block_id,
+    public Block(Block preblock, int blockid,
     int nonce, Transaction tx, String difficulty) {
-        setPreBlockHash(preblock);
-        setBlockID(block_id);
-        setNonce(nonce);
+        this.pre_block_hash = preblock.blockhash;
+        this.blockid = blockid;
+        this.nonce = nonce;
         this.merkletree = new MerkleTree(tx);
         this.merkleroot = merkletree.merklelist.get(merkletree.merklelist.size() - 1);
         this.difficulty = difficulty;
         this.timestamp = 0;
-        this.blockhash = this.getBlockHash();
+        this.blockhash = this.makeBlockHash();
     }
-
-    private HashString getPreBlockHash() {return this.pre_block_hash;}
-    private int setPreBlockHash(Block preblock) {
-        this.pre_block_hash = preblock.blockhash;
-        return 0;
+    public String getPreBlockHash() {
+        return this.pre_block_hash.getHashCopy();
     }
-    public int getBlockID() {return blockid;}
-    private int setBlockID(int newbid) {
-        this.blockid = newbid;
-        return 0;
-    }
+    public int getBlockID() {return this.blockid;}
     public int getNonce() {
         int tmpn;
         synchronized(this) {tmpn = nonce;}
         return tmpn;
     }
-    private int setNonce(int nonce) {
-        this.nonce = nonce;
-        return 0;
+    public ArrayList<Transaction> getTXList() {
+        ArrayList<Transaction> tmparr;
+        synchronized(this.merkletree) {tmparr = merkletree.getTXListCopy();}
+        return tmparr;
     }
-    public String getDifficulty() {return difficulty;}
-    private int setDifficulty(String difficulty) {
-        this.difficulty = new String(difficulty);
-        return 0;
+    public ArrayList<MerkleTree> getMerkleTree() {
+        this.merkletree.g
     }
-    private ArrayList<HashString> getMerkleTree() {
+    public String getMerkleRoot() {
+        String tmps;
+        synchronized(this.merkletree) {tmps = merkletree.getMerkleRootCopy().getHashCopy();}
+        return tmps;
+    }
+    public String getDifficulty() {return new String(this.difficulty);}
+    public int getTimeStamp() {return this.timestamp;}
+    public String getBlockHash() {
+        String tmps;
+        synchronized(this) {tmps = new String(this.blockhash.getHashCopy());}
+        return tmps;
+    }
+
+
+
+    private HashString getPreBlockHashOrg() {return this.pre_block_hash;}
+    private ArrayList<HashString> getMerkleTreeOrg() {
         ArrayList<HashString> tmpmt;
         synchronized(this) {tmpmt = this.merkletree.merklelist;}
         return tmpmt;
     }
-    private int setMerkleTree(MerkleTree newmt) {
-        this.merkletree = newmt;
-        return 0;
-    }
-    private HashString getMerkleRoot() {
+    private HashString getMerkleRootOrg() {
         HashString tmpmr;
         synchronized(this) {tmpmr = merkleroot;}
         return tmpmr;
     }
-    private int setMerkleRoot() {
-        this.merkle_tree.getMerkleRoot();
-    }
-    public int getTimestamp() {
+    private int getTimestamp() {
         int tmpts;
         synchronized(this) {tmpts = timestamp;}
         return tmpts;
     }
-    public Block getBlock() {
+    private Block getBlockOrg() {
         Block tmpb;
-        synchronized(this) {tmpb = new Block(this);}
+        synchronized(this) {tmpb = this;}
         return tmpb;
     }
-    public HashString getBlockHash() {
-        return new HashString(Hashing.getHash(this));
-    }
-    public Block getBlockCopy() {
-        
-    }
+    
     public void printBlock(){
         ArrayList<Transaction> tx_list = merkle_tree.getTXList();
         System.out.println("=========================================================");
@@ -106,7 +102,13 @@ public class Block implements Serializable {
         System.out.println("block hash: " + getBlockHash());
         System.out.println("=========================================================");
     }
-    
+
+    private HashString makeBlockHash() {
+        HashString hs = null;
+        synchronized(this) {hs = new HashString(Hashing.getHash(this));}
+        return hs;
+    }
+
     public void addTX(Transaction new_tx) {
         synchronized(this) {
             this.merkle_tree.addTX(new_tx);
