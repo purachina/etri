@@ -1,15 +1,12 @@
 package core;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-import core.Atom.*;
 import util.Hashing;
 
-public class MerkleTree {
+public class MerkleTree implements Serializable {
     private ArrayList<Transaction> txlist;
-    protected ArrayList<HashString> merklelist;
-    public MerkleTree() {
-        this.initMerkleTree(null);
-    }
+    protected ArrayList<String> merklelist;
     public MerkleTree(Transaction coinbase_tx) {
         this.initMerkleTree(coinbase_tx);
     }
@@ -23,63 +20,71 @@ public class MerkleTree {
 
     
     public ArrayList<Transaction> getTXList() {
-        ArrayList<Transaction> tmptxl;
-        tmptxl = new ArrayList<Transaction>();
+        ArrayList<Transaction> ret;
+        ret = new ArrayList<Transaction>();
         synchronized(this) {
-            for(int i = 0; i > txlist.size(); i++) tmptxl.add(txlist.get(i).getTXCopy());
+            for(int i = 0; i < txlist.size(); i++) {
+                ret.add(txlist.get(i).getTX());
+            }
         }
-        return tmptxl;
+        return ret;
     }
-    public HashString getMerkleRoot() {
+    private int setTXList(ArrayList<Transaction> newtxlist) {
+        this.txlist = new ArrayList<Transaction>();
+        synchronized(newtxlist) {
+            for(int i = 0; i < newtxlist.size(); i++) {
+                this.txlist.add(newtxlist.get(i));
+            }
+        }
+        return 0;
+    }
+    public String getMerkleRoot() {
         this.makeMerkle();
-        return merklelist.get(merklelist.size() - 1);
+        String ret = null;
+        synchronized(merklelist) {
+            ret = new String(merklelist.get(merklelist.size() - 1));
+        }
+        return ret;
     }
-    public ArrayList<HashString> getMerkleList() {
-        return this.merklelist;
-    }
-    public byte[] getBytes() {
-        
+    public ArrayList<String> getMerkleList() {
+        ArrayList<String> ret = new ArrayList<String>();
+        synchronized(this) {
+            for(int i = 0; i < this.merklelist.size(); i++) {
+                ret.add(merklelist.get(i));
+            }
+        }
+        return ret;
     }
 
     public int addTX(Transaction newtx) {
         synchronized(this) {
-            this.txlist.add(newtx);
+            txlist.add(newtx);
             makeMerkle();
         }
         return 0;
     }
     private int initMerkleTree(Transaction coinbase_tx) {
-        this.txlist = new ArrayList<Transaction>();
-        if (coinbase_tx == null) this.txlist.add(new Transaction());
-        else this.txlist.add(coinbase_tx);
-
-        this.makeMerkle();
-        return 0;
-    }
-    private int setTXList(ArrayList<Transaction> txlist) {
-        this.txlist = new ArrayList<Transaction>();
-        for (int i = 0; i < txlist.size(); i++) {
-            this.txlist.add(txlist.get(i).getTXCopy());
+        synchronized(this) {
+            txlist = new ArrayList<Transaction>();
+            txlist.add(coinbase_tx);
+            this.makeMerkle();
         }
         return 0;
     }
 
     public int makeMerkle() {
         synchronized(this) {
-            merklelist = new ArrayList<HashString>();
+            String hash1, hash2;
+            merklelist = new ArrayList<String>();
             for (int i = 0; i < txlist.size(); i += 2) {
                 if (i + 1 == txlist.size()) {
-                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).getHash());
-
-                    this.merklelist.add(hs1);
+                    hash1 = new String(Hashing.makeHash(txlist.get(i).getHash()));
+                    this.merklelist.add(hash1);
                 }
                 else {
-                    HashString hs1 = new HashString(Hashing.getHash(txlist.get(i).payer.content + txlist.get(i).payee.content + txlist.get(i).amount.content));
-
-                    HashString hs2 = new HashString(Hashing.getHash(txlist.get(i + 1).payer.content + txlist.get(i + 1).payee.content + txlist.get(i + 1).amount.content));
-
-                    hs1 = new HashString(Hashing.getHash(hs1.hashvalue + hs2.hashvalue));
-                    this.merklelist.add(hs1);
+                    hash1 = new String(Hashing.makeHash(txlist.get(i).getHash()));
+                    hash2 = new String(Hashing.makeHash(txlist.get(i + 1).getHash()));
+                    this.merklelist.add(new String(Hashing.makeHash(hash1 + hash2)));
                 }
             }
             int piv = 0;
@@ -88,15 +93,14 @@ public class MerkleTree {
                 if (cSize == piv + 1) break;
                 for (; piv < cSize; piv += 2) {
                     if (piv + 1 == this.merklelist.size()) {
-                        HashString hs = new HashString(Hashing.getHash(this.merklelist.get(piv).hashvalue));
-
-                        this.merklelist.add(hs);
+                        hash1 = new String(Hashing.makeHash(this.merklelist.get(piv)));
+                        this.merklelist.add(hash1);
                         piv--;
                     }
                     else {
-                        HashString hs = new HashString(Hashing.getHash(this.merklelist.get(piv).hashvalue + Hashing.getHash(this.merklelist.get(piv + 1).hashvalue)));
-
-                        this.merklelist.add(hs);
+                        hash1 = new String(Hashing.makeHash(this.merklelist.get(piv)));
+                        hash2 = new String(Hashing.makeHash(this.merklelist.get(piv + 1)));
+                        this.merklelist.add(new String(Hashing.makeHash(hash1 + hash2)));
                     }
                 }
             }

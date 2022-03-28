@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 
 public class Hashing {
     
-    public static String getHash(String input){
+    public static String makeHash(String input){
         try {
             StringBuffer res = new StringBuffer();
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -25,7 +25,8 @@ public class Hashing {
         }
         return null;
     }
-    public static String getHash(Object input) {
+    /*
+    public static String makeHash(Object input) {
         try {
             StringBuffer res = new StringBuffer();
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -45,6 +46,7 @@ public class Hashing {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return null;
     }
-    return null;
+    */
 }

@@ -1,15 +1,23 @@
 package core;
 
 import java.util.*;
+
+import util.BlockChainIO;
 import util.Init;
 public class BlockChain {
     public static Block cblock;
     public static ArrayList<Block> blockchain;
-    public static int setBlockchain(ArrayList<Block> nbc) {
+    static boolean closechk = false;
+    public static int setBlockchain(ArrayList<Block> newbc) {
         synchronized(blockchain) {
             ArrayList<Block> tmpbc = new ArrayList<Block>();
-            for (int i = 0; i < nbc.size(); i++) {
-                tmpbc.add(new Block(nbc.get(i)));
+            Block tmpblock;
+            for (int i = 0; i < newbc.size(); i++) {
+                tmpblock = new Block(newbc.get(i));
+                if (!tmpblock.getAvailable()) {
+                    return 1;
+                }
+                else tmpbc.add(tmpblock);
             }
             blockchain = tmpbc;
         }
@@ -19,39 +27,54 @@ public class BlockChain {
         Scanner sc = new Scanner(System.in);
         //System.out.println("Where is server?");
         //chkInit.execInit(sc.nextLine());
-        blockchain = new ArrayList<Block>();
-        blockchain.add(new Block());
+        if (BlockChainIO.fileCheck()) {
+            blockchain = BlockChainIO.readBlockChain();
+            for (int i = 0; i < blockchain.size(); i++) {
+                Block tmpblock = new Block(blockchain.get(i));
+                if (!tmpblock.equals(blockchain.get(i))) {
+                    System.out.println("there is something problem");
+                }
+            }
+        }
+        else {
+            blockchain = new ArrayList<Block>();
+            blockchain.add(new Block());
+        }
         cblock = blockchain.get(blockchain.size() - 1);
         new Thread() {
             public void run() {
+                Transaction coinbase_tx = new Transaction();
                 while (true) {
-                    blockchain.add(cblock.mine());
-                    cblock = blockchain.get(blockchain.size() - 1);
-                    
+                    Block tmpblock = cblock.mine(coinbase_tx);
+                    if (tmpblock == null) return;
+                    blockchain.add(tmpblock);
+                    cblock = tmpblock;
+                    if (closechk == true) return;
                 }
             }   
         }.start();
         new Thread() {
             public void run() {
                 while (true) {
-                    String payer, payee = "";
-                    double amount = 0;
+                    String payer, payee, amount, ans = "";
                     System.out.println(
-                        "\n\nCheck the blockchain: chk\nAdd the transaction: add"
+                        "\n\nCheck the blockchain: chk\nAdd the transaction: add\nClose the Program: cls\nSave this blockchain: save"
                     );
-                    payer = sc.next();
-                    if (payer.equals("chk")) {
+                    ans = sc.next();
+                    if (ans.equals("chk")) {
                         for (int i = 0; i < blockchain.size(); i++) {
-                            blockchain.get(i).getBlockInfo();
+                            String out = blockchain.get(i).getBlockInfo();
+                            System.out.println(out);
+                            System.out.println("===================================================");
                         }
                     }
-                    else if (payer.equals("add")) {
+                    else if (ans.equals("add")) {
                         System.out.print("Payer: ");
                         payer = sc.next();
                         System.out.print("Payee: ");
                         payee = sc.next();
                         System.out.print("Amount: ");
-                        amount = sc.nextDouble();
+                        amount = sc.next();
                         Transaction tx = new Transaction(payer, payee, amount);
                         tx.getInfo();
                         cblock.addTX(tx);
@@ -59,8 +82,18 @@ public class BlockChain {
                             blockchain.get(i).getBlockInfo();
                         }
                     }
+                    else if (ans.equals("cls")) {
+                        closechk = true;
+                        return;
+                    }
+                    else if (ans.equals("save")) {
+                        synchronized(blockchain) {
+                            util.BlockChainIO.saveBlockChain(blockchain);
+                        }
+                    }
                 }
             }
         }.start();
+        if (closechk) sc.close();
     }
 }

@@ -2,45 +2,38 @@ package core;
 
 import java.io.Serializable;
 
-import core.Atom.HashString;
-import core.Atom.TXString;
 import util.Hashing;
 
 public class Transaction implements Serializable{
     
-    TXString payer, payee, amount;
+    private String payer, payee, amount;
     
-    public Transaction(String payer, String payee, String amount) {
-        this.payer = new TXString();
-        this.payee = new TXString();
-        this.amount = new TXString();
-        this.setPayer(payer);
-        this.setPayee(payee);
-        this.setAmount(amount);
+    public Transaction(String newpayer, String newpayee, String newamount) {
+        payer = new String(newpayer);
+        payee = new String(newpayee);
+        amount = new String(newamount);
     }
     public Transaction() {
-        this.setPayer("Advanced Secured Decentralized Facility");
-        this.setPayee("Designed by Purachina");
-        this.setAmount("0");
+        payer = new String("Advanced Secured Decentralized Facility");
+        payee = new String("Designed by Purachina");
+        amount = new String("0");
     }
-    public Transaction getTXCopy() {
-        Transaction tmptx = new Transaction(this.getPayer(), this.getPayee(), this.getAmount());
-        return tmptx;
-    }
-    public String getPayer() {return this.payer.toString();}
-    public String getPayee() {return this.payee.toString();}
-    public String getAmount() {return this.amount.toString();}
-    public String getInfo() {
-        return new String(this.payer.toString() + " sends " + this.amount.toString() + "BTC to " + this.payee.toString());
-    }
-    public HashString getHash() {
-        HashString ret = new HashString(Hashing.getHash(payer.getHash().toString() + payee.getHash().toString() + amount.getHash().toString()));
+    public Transaction getTX() {
+        Transaction ret = new Transaction(this.getPayer(), this.getPayee(), this.getAmount());
         return ret;
     }
-    protected TXString getPayerOrg() {return this.payer;}
-    protected TXString getPayeeOrg() {return this.payee;}
-    protected TXString getAmountOrg() {return this.amount;}
-    private void setPayer(String payer) {this.payer.content = payer;}
-    private void setPayee(String payee) {this.payee.content = payee;}
-    private void setAmount(String amount) {this.amount.content = amount;}    
+    public String getPayer() {return new String(payer);}
+    public String getPayee() {return new String(payee);}
+    public String getAmount() {return new String(amount);}
+    public String getInfo() {
+        return new String(payer + " sends " + amount + "BTC to " + payee);
+    }
+    public String getHash() {
+        String hash = Hashing.makeHash(payer + payee + amount);
+        if (hash == null) {
+            System.out.println("There's a problem to make hash about tx");
+            return null;
+        }
+        return Hashing.makeHash(payer + payee + amount);
+    }
 }

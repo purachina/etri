@@ -2,129 +2,164 @@ package core;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import core.Atom.HashString;
 import util.Hashing;
 
 public class Block implements Serializable {
-    private HashString pre_block_hash, blockhash, merkleroot;
-    private String difficulty;
+    private String pre_block_hash, blockhash, merkleroot, difficulty;
     private MerkleTree merkletree;
     private int blockid, nonce, timestamp;
-
+    private boolean available;
     public Block() {
-        this.pre_block_hash = new HashString();
+        this.pre_block_hash = null;
         this.blockid = 0;
         this.nonce = 0;
-        this.merkletree = new MerkleTree();
-        this.merkleroot = merkletree.merklelist.get(merkletree.merklelist.size() - 1);
+        this.merkletree = new MerkleTree(new Transaction());
         this.difficulty = "0";
         this.timestamp = 0;
+        this.available = true;
+        this.refresh();
     }
-    public Block(Block preblock, int blockid,
-    int nonce, Transaction tx, String difficulty) {
-        this.pre_block_hash = preblock.blockhash;
-        this.blockid = blockid;
-        this.nonce = nonce;
-        this.merkletree = new MerkleTree(tx);
-        this.merkleroot = merkletree.merklelist.get(merkletree.merklelist.size() - 1);
-        this.difficulty = difficulty;
+    public Block(Block preblock, int newblockid,
+    int newnonce, Transaction newtx, String newdifficulty) {
+        this.pre_block_hash = new String(preblock.getBlockHash());
+        this.blockid = newblockid;
+        this.nonce = newnonce;
+        this.merkletree = new MerkleTree(newtx);
+        this.difficulty = new String(newdifficulty);
         this.timestamp = 0;
-        this.blockhash = this.makeBlockHash();
+        this.available = true;
+        this.refresh();
+    }
+    public Block(Block newblock) {
+        synchronized(newblock) {
+            this.available = true;
+            this.pre_block_hash = newblock.getPreBlockHash();
+            this.blockid = newblock.getBlockID();
+            this.nonce = newblock.getNonce();
+            this.setMerkleTree(newblock.merkletree);
+            this.difficulty = new String(newblock.getDifficulty());
+            this.timestamp = newblock.timestamp;
+            this.refresh();
+            if (!this.getBlockHash().equals(newblock.getBlockHash()) && this.available != false) {
+                this.available = false;
+            }
+            else {this.available = true;}
+        }
     }
     public String getPreBlockHash() {
-        return this.pre_block_hash.getHashCopy();
+        if (this.pre_block_hash != null) return new String(this.pre_block_hash);
+        return "null";
     }
     public int getBlockID() {return this.blockid;}
     public int getNonce() {
-        int tmpn;
-        synchronized(this) {tmpn = nonce;}
-        return tmpn;
+        int ret;
+        synchronized(this) {ret = this.nonce;}
+        return ret;
     }
     public ArrayList<Transaction> getTXList() {
-        ArrayList<Transaction> tmparr;
-        synchronized(this.merkletree) {tmparr = merkletree.getTXListCopy();}
-        return tmparr;
+        ArrayList<Transaction> ret;
+        synchronized(this.merkletree) {ret = this.merkletree.getTXList();}
+        return ret;
     }
-    public ArrayList<MerkleTree> getMerkleTree() {
-        this.merkletree.g
+    public MerkleTree getMerkleTree() {
+        MerkleTree ret;
+        synchronized(this.merkletree) {
+            this.refresh();
+            ret = new MerkleTree(this.merkletree);
+        }
+        return ret;
     }
     public String getMerkleRoot() {
-        String tmps;
-        synchronized(this.merkletree) {tmps = merkletree.getMerkleRootCopy().getHashCopy();}
-        return tmps;
+        String ret;
+        synchronized(this.merkletree) {
+            this.refresh();
+            ret = new String(this.merkletree.getMerkleRoot());
+        }
+        return ret;
     }
     public String getDifficulty() {return new String(this.difficulty);}
     public int getTimeStamp() {return this.timestamp;}
     public String getBlockHash() {
-        String tmps;
-        synchronized(this) {tmps = new String(this.blockhash.getHashCopy());}
-        return tmps;
-    }
-
-
-
-    private HashString getPreBlockHashOrg() {return this.pre_block_hash;}
-    private ArrayList<HashString> getMerkleTreeOrg() {
-        ArrayList<HashString> tmpmt;
-        synchronized(this) {tmpmt = this.merkletree.merklelist;}
-        return tmpmt;
-    }
-    private HashString getMerkleRootOrg() {
-        HashString tmpmr;
-        synchronized(this) {tmpmr = merkleroot;}
-        return tmpmr;
-    }
-    private int getTimestamp() {
-        int tmpts;
-        synchronized(this) {tmpts = timestamp;}
-        return tmpts;
-    }
-    private Block getBlockOrg() {
-        Block tmpb;
-        synchronized(this) {tmpb = this;}
-        return tmpb;
-    }
-    
-    public void printBlock(){
-        ArrayList<Transaction> tx_list = merkle_tree.getTXList();
-        System.out.println("=========================================================");
-        System.out.print("pre_block_hash: " + getPreBlockHash().getBHCopy());
-        System.out.println("block ID: " + getBlockID());
-        System.out.println("block nonce: " + getNonce());
-        System.out.println("difficulty: " + getDifficulty());
-        System.out.println("number of TXs: " + merkle_tree.getTXList().size());
-        System.out.println("merkle root: " + getMerkleRoot());
-        System.out.println("----------------TRANSACTIONS----------------");
-        for (int i = 0; i < tx_list.size(); i++) {
-            System.out.println(tx_list.get(i).getInfo());
-        }
-        System.out.println("----------------TRANSACTIONS----------------");
-        System.out.println("block hash: " + getBlockHash());
-        System.out.println("=========================================================");
-    }
-
-    private HashString makeBlockHash() {
-        HashString hs = null;
-        synchronized(this) {hs = new HashString(Hashing.getHash(this));}
-        return hs;
-    }
-
-    public void addTX(Transaction new_tx) {
+        String ret;
         synchronized(this) {
-            this.merkle_tree.addTX(new_tx);
-            this.merkle_root = this.merkle_tree.getMerkleRoot();
-            this.setNonce(0);
+            this.refresh();
+            ret = new String(this.blockhash);
+        }
+        return ret;
+    }
+    public boolean getAvailable() {return this.available;}
+    private int setMerkleRoot() {
+        synchronized(this) {
+            this.merkletree.makeMerkle();
+            this.merkleroot = this.merkletree.getMerkleRoot();
+        }
+        return 0;
+    }
+    private int setMerkleTree(MerkleTree newmt) {
+        synchronized(this) {
+            synchronized(newmt) {
+                this.merkletree = new MerkleTree(newmt);
+                this.refresh();
+                if (!this.getMerkleRoot().equals(newmt.getMerkleRoot())) {
+                    System.out.println("There's a problem with merkletree");
+                    this.available = false;
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    public int refresh() {
+        synchronized(this) {
+            this.setMerkleRoot();
+            this.blockhash = Hashing.makeHash(this.pre_block_hash + this.nonce + this.timestamp + this.merkleroot);
+        }
+        return 0;
+    }
+    public int getTimestamp() {
+        int ret;
+        synchronized(this) {ret = timestamp;}
+        return ret;
+    }
+    public String getBlockInfo(){
+        String ret;
+        synchronized (this) {
+            this.refresh();
+            ArrayList<Transaction> tmptxlist = this.merkletree.getTXList();
+            ret = "Pre_block_hash = " + this.getPreBlockHash() + "\n";
+            ret += "Block ID = " + this.getBlockID() + "\n";
+            ret += "Nonce = " + this.getNonce() + "\n";
+            ret += "Difficulty = " + this.getDifficulty() + "\n";
+            ret += "Merkleroot = " + this.getMerkleRoot() + "\n";
+            ret += "Number of TX = " + tmptxlist.size() + "\n";
+            ret += "\n";
+            for (int i = 0; i < tmptxlist.size(); i++) {
+                ret += tmptxlist.get(i).getInfo() + "\n";
+            }
+            ret += "Block hash = " + this.getBlockHash();
+        }
+        return ret;
+    }
+
+    public boolean equals(Block target) {
+        return target.getBlockHash().equals(this.getBlockHash());
+    }
+
+    public void addTX(Transaction newtx) {
+        synchronized(this) {
+            this.merkletree.addTX(newtx);
+            this.nonce = 0;
             this.timestamp++;
+            this.refresh();
         }
     }
 
-    public Block mine() {
+    public Block mine(Transaction coinbase_tx) {
         long time = System.currentTimeMillis();
-        Transaction coinbase_tx;
         while (true) {
             synchronized (this) {
-                if (getBlockHash().bh.substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
-                    coinbase_tx = new Transaction("minor", "minor", 12.5);
+                if (BlockChain.closechk == true) return null;
+                if (this.getBlockHash().substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
                     time = System.currentTimeMillis() - time;
                     if (time < 6000) {
                         return new Block(

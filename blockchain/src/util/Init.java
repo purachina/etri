@@ -13,6 +13,8 @@ import core.BlockChain;
 
 public class Init {
     public static int execInit(String server_ip) {
+
+        
         // receive whole node's ip list and whole blockchain and hash from manager node
         if (server_ip.equals("127.0.0.1") || server_ip.equals("")) {
             Communicate.initNodeList();

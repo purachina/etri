@@ -20,17 +20,46 @@ import java.net.SocketTimeoutException;
 import java.io.Serializable;
 
 public class App {
-    public static class TmpStruct implements Serializable {
-        public String qwer;
-        public TmpStruct() {
-            qwer = "asdf";
+    public static class InnerStruct {
+        public String i;
+        public InnerStruct() {i = new String("");}
+        public void edit(String tmp) {
+            synchronized(this.i) {
+                i = tmp;
+                System.out.println(i);
+            }
         }
     }
-    public static void foo(String asdf) {System.out.println(asdf);}
-    public static void foo(Object asdf) {System.out.println("object");}
+    public static class TmpStruct {
+        public InnerStruct is;
+        public TmpStruct() {
+            is = new InnerStruct();
+        }
+        public void edit(String tmp) {synchris.edit(tmp);}
+    }
     
     public static void main(String[] args) {
-        foo(new TmpStruct());
-        foo(new String("String"));
+        TmpStruct ts = new TmpStruct();
+        new Thread() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    ts.edit(Integer.toString(i));
+                }
+            }   
+        }.start();
+        new Thread() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    ts.edit(Integer.toString(i));
+                }
+            }   
+        }.start();
+        new Thread() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    ts.edit(Integer.toString(i));
+                }
+            }   
+        }.start();
     }
 }
