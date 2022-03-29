@@ -18,6 +18,11 @@ public class Transaction implements Serializable{
         payee = new String("Designed by Purachina");
         amount = new String("0");
     }
+    public Transaction(Transaction tx) {
+        payer = new String(tx.getPayer());
+        payee = new String(tx.getPayee());
+        amount = new String(tx.getAmount());
+    }
     public Transaction getTX() {
         Transaction ret = new Transaction(this.getPayer(), this.getPayee(), this.getAmount());
         return ret;
@@ -27,6 +32,10 @@ public class Transaction implements Serializable{
     public String getAmount() {return new String(amount);}
     public String getInfo() {
         return new String(payer + " sends " + amount + "BTC to " + payee);
+    }
+    public int printTX() {
+        System.out.println(payer + " sends " + amount + "BTC to " + payee);
+        return 0;
     }
     public String getHash() {
         String hash = Hashing.makeHash(payer + payee + amount);

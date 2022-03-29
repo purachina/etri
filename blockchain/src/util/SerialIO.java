@@ -11,32 +11,37 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import core.Block;
-public class BlockChainIO {
+import core.BlockChain;
+public class SerialIO {
     public static boolean fileCheck() {
         File tmpfile = new File("C:\\test\\binary.abc");
         return tmpfile.exists();
     }
-    public static ArrayList<Block> readBlockChain() {
+    public static int readbin() {
         try {
             FileInputStream fis = new FileInputStream("C:\\test\\binary.abc");
             BufferedInputStream bin = new BufferedInputStream(fis);
             ObjectInputStream ois = new ObjectInputStream(bin);
-            ArrayList<Block> ret = (ArrayList<Block>)ois.readObject();
+            ArrayList<Block> blockchain = (ArrayList<Block>)ois.readObject();
+            ArrayList<String> nodelist = (ArrayList<String>)ois.readObject();
             ois.close();
             fis.close();
-            return ret;
+            BlockChain.setBlockchain(blockchain);
+            Communicate.setNodeList(nodelist);
+            return 0;
         } catch (IOException | ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return null;
+        return 1;
     }
-    public static int saveBlockChain(ArrayList<Block> target) {
+    public static int savebin(ArrayList<Block> blockchain, ArrayList<String> nodelist) {
         try {
             FileOutputStream fos = new FileOutputStream("C:\\test\\binary.abc");
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(target);
+            oos.writeObject(blockchain);
+            oos.writeObject(nodelist);
             oos.close();
             fos.close();
             return 0;

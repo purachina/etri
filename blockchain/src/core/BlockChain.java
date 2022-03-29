@@ -2,12 +2,34 @@ package core;
 
 import java.util.*;
 
-import util.BlockChainIO;
+import util.Communicate;
 import util.Init;
-public class BlockChain {
-    public static Block cblock;
-    public static ArrayList<Block> blockchain;
-    static boolean closechk = false;
+import util.SerialIO;
+import util.UserControl;
+public class BlockChain extends Thread {
+    private static Block cblock;
+    private static ArrayList<Block> blockchain = new ArrayList<Block>();
+    public BlockChain() {
+        Init.init();
+    }
+    public static Block getCurrentBlock() {
+        return new Block(cblock);
+    }
+    public static ArrayList<Block> getBlockChain() {
+        ArrayList<Block> ret = new ArrayList<Block>();
+        synchronized (blockchain) {
+            for (int i = 0; i < blockchain.size(); i++) {
+                ret.add(new Block(blockchain.get(i)));
+            }
+        }
+        return ret;
+    }
+    public static int printBlockChain() {
+        for (int i = 0; i < blockchain.size(); i++) {
+            blockchain.get(i).printBlock();
+        }
+        return 0;
+    }
     public static int setBlockchain(ArrayList<Block> newbc) {
         synchronized(blockchain) {
             ArrayList<Block> tmpbc = new ArrayList<Block>();
@@ -23,77 +45,41 @@ public class BlockChain {
         }
         return 0;
     }
-    public static void main (String[] args) {
-        Scanner sc = new Scanner(System.in);
-        //System.out.println("Where is server?");
-        //chkInit.execInit(sc.nextLine());
-        if (BlockChainIO.fileCheck()) {
-            blockchain = BlockChainIO.readBlockChain();
-            for (int i = 0; i < blockchain.size(); i++) {
-                Block tmpblock = new Block(blockchain.get(i));
-                if (!tmpblock.equals(blockchain.get(i))) {
-                    System.out.println("there is something problem");
-                }
-            }
+    public static int addTX(Transaction tx) {
+        synchronized(cblock) {
+            cblock.addTX(new Transaction(tx));
         }
-        else {
-            blockchain = new ArrayList<Block>();
-            blockchain.add(new Block());
-        }
-        cblock = blockchain.get(blockchain.size() - 1);
-        new Thread() {
-            public void run() {
+        return 0;
+    }
+    public static class MiningThread extends Thread {
+        public void run() {
+            while(true) {
                 Transaction coinbase_tx = new Transaction();
-                while (true) {
-                    Block tmpblock = cblock.mine(coinbase_tx);
-                    if (tmpblock == null) return;
-                    blockchain.add(tmpblock);
-                    cblock = tmpblock;
-                    if (closechk == true) return;
+                Block newblock = cblock.mine(coinbase_tx);
+                if (newblock != null) {
+                    synchronized (blockchain) {
+                        blockchain.add(newblock);
+                        cblock = newblock;
+                    }
                 }
-            }   
-        }.start();
-        new Thread() {
-            public void run() {
-                while (true) {
-                    String payer, payee, amount, ans = "";
-                    System.out.println(
-                        "\n\nCheck the blockchain: chk\nAdd the transaction: add\nClose the Program: cls\nSave this blockchain: save"
-                    );
-                    ans = sc.next();
-                    if (ans.equals("chk")) {
-                        for (int i = 0; i < blockchain.size(); i++) {
-                            String out = blockchain.get(i).getBlockInfo();
-                            System.out.println(out);
-                            System.out.println("===================================================");
-                        }
-                    }
-                    else if (ans.equals("add")) {
-                        System.out.print("Payer: ");
-                        payer = sc.next();
-                        System.out.print("Payee: ");
-                        payee = sc.next();
-                        System.out.print("Amount: ");
-                        amount = sc.next();
-                        Transaction tx = new Transaction(payer, payee, amount);
-                        tx.getInfo();
-                        cblock.addTX(tx);
-                        for (int i = 0; i < blockchain.size(); i++) {
-                            blockchain.get(i).getBlockInfo();
-                        }
-                    }
-                    else if (ans.equals("cls")) {
-                        closechk = true;
-                        return;
-                    }
-                    else if (ans.equals("save")) {
-                        synchronized(blockchain) {
-                            util.BlockChainIO.saveBlockChain(blockchain);
-                        }
-                    }
+                if (UserControl.closechk == true) return;
+            }
+        }
+    }
+    public void run() {
+        if (blockchain == null) blockchain = new ArrayList<Block>();
+        if (blockchain.size() == 0) blockchain.add(new Block());
+        cblock = blockchain.get(blockchain.size() - 1);
+        while(true) {
+            Transaction coinbase_tx = new Transaction();
+            Block newblock = cblock.mine(coinbase_tx);
+            if (newblock != null) {
+                synchronized (blockchain) {
+                    blockchain.add(newblock);
+                    cblock = newblock;
                 }
             }
-        }.start();
-        if (closechk) sc.close();
+            if (UserControl.closechk == true) return;
+        }
     }
 }

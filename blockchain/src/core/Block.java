@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import util.Hashing;
+import util.UserControl;
 
 public class Block implements Serializable {
     private String pre_block_hash, blockhash, merkleroot, difficulty;
@@ -121,6 +122,24 @@ public class Block implements Serializable {
         synchronized(this) {ret = timestamp;}
         return ret;
     }
+    public int printBlock() {
+        synchronized (this) {
+            this.refresh();
+            ArrayList<Transaction> tmptxlist = this.merkletree.getTXList();
+            System.out.println("Pre_block_hash = " + this.getPreBlockHash());
+            System.out.println("Block ID = " + this.getBlockID());
+            System.out.println("Nonce = " + this.getNonce());
+            System.out.println("Difficulty = " + this.getDifficulty());
+            System.out.println("Merkleroot = " + this.getMerkleRoot());
+            System.out.println("Number of TX = " + tmptxlist.size());;
+            for (int i = 0; i < tmptxlist.size(); i++) {
+                tmptxlist.get(i).printTX();
+            }
+            System.out.println("Block hash = " + this.getBlockHash());
+        }
+        System.out.println("============================================");
+        return 0;
+    }
     public String getBlockInfo(){
         String ret;
         synchronized (this) {
@@ -158,7 +177,7 @@ public class Block implements Serializable {
         long time = System.currentTimeMillis();
         while (true) {
             synchronized (this) {
-                if (BlockChain.closechk == true) return null;
+                if (UserControl.closechk == true) return null;
                 if (this.getBlockHash().substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
                     time = System.currentTimeMillis() - time;
                     if (time < 6000) {

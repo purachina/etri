@@ -13,8 +13,8 @@ import core.Block;
 import core.Transaction;
 
 public class Communicate {
-    private static ArrayList<String> node;
-    private static ArrayList<String> recv_hash;
+    private static ArrayList<String> node = new ArrayList<String>();
+    private static ArrayList<String> recv_hash = new ArrayList<String>();
     protected static int removeNode(String target) {
         synchronized(node) {
             node.remove(target);
@@ -28,7 +28,7 @@ public class Communicate {
         }
         return 0;
     }
-    protected static int copyNodeList(ArrayList<String> target) {
+    protected static int setNodeList(ArrayList<String> target) {
         synchronized(node) {
             if (node == null) node = new ArrayList<String>();
             node.clear();
@@ -38,7 +38,7 @@ public class Communicate {
         }
         return 0;
     }
-    protected static ArrayList<String> getNodeList() {
+    public static ArrayList<String> getNodeList() {
         ArrayList<String> tmp = new ArrayList<String>();
         synchronized(node) {
             for (int i = 0; i < node.size(); i++) {
@@ -47,11 +47,12 @@ public class Communicate {
         }
         return tmp;
     }
-    protected static int initNodeList() {
-        node = new ArrayList<String>();
+    public static int printNodeList() {
+        for (int i = 0; i < node.size(); i++) {
+            System.out.println(node.get(i));
+        }
         return 0;
     }
-
     protected static int sendSomething(Socket socket, Object o) {
         try {
             String new_node = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
