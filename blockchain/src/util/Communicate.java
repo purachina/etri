@@ -65,11 +65,11 @@ public class Communicate {
             if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                pw.print("sending object");
+                pw.println("sending object");
                 pw.flush();
                 pw.close();
+                ans = "";
                 while(true) {
-                    ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
                     ans += (char)ch;
@@ -101,14 +101,14 @@ public class Communicate {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());
                 BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                ans = "";
                 while(true) {
-                    ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
                     ans += (char)ch;
                 }
                 if (ans.equals("sending object")) {
-                    pw.print("gotit");
+                    pw.println("gotit");
                     pw.flush();
                     ObjectInputStream ois =
                     new ObjectInputStream(socket.getInputStream());
@@ -130,8 +130,8 @@ public class Communicate {
             PrintWriter pw = new PrintWriter(socket.getOutputStream());
             BufferedReader br =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ans = "";
             while(true) {
-                ans = "";
                 int ch = br.read();
                 if (ch < 0 || ch == '\n') break;
                 ans += (char)ch;
@@ -140,10 +140,10 @@ public class Communicate {
             System.out.println(ans + "end");
             if (ans.equals("asdf")) {
                 System.out.println("Handshake authed");
-                pw.print("OK");
+                pw.println("OK");
                 pw.flush();
+                ans = "";
                 while(true) {
-                    ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
                     ans += (char)ch;
@@ -166,17 +166,17 @@ public class Communicate {
             BufferedReader br =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String ans;
-            pw.print("asdf");
+            pw.println("asdf");
             pw.flush();
+            ans = "";
             while(true) {
-                ans = "";
                 int ch = br.read();
                 if (ch < 0 || ch == '\n') break;
                 ans += (char)ch;
             }
             if (ans.equals("OK")) {
                 System.out.println("Handshake authed");
-                pw.print(tar);
+                pw.println(tar);
                 pw.flush();
             }
             pw.close();
