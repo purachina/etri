@@ -64,7 +64,7 @@ public class Communicate {
             }
             String ans;
             if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
-                PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
+                /*PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 pw.println("sending object");
                 pw.flush();
@@ -81,7 +81,11 @@ public class Communicate {
                     oos.writeObject(o);
                     oos.flush();
                     oos.close();
-                }
+                }*/
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(o);
+                oos.flush();
+                oos.close();
                 return 0;
             }
             else {
@@ -100,7 +104,7 @@ public class Communicate {
         String ans;
         System.out.println(socket.getInetAddress().getHostAddress());
         try {
-                PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                /*PrintWriter pw = new PrintWriter(socket.getOutputStream());
                 BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 ans = "";
@@ -117,7 +121,9 @@ public class Communicate {
                     recv_item = ois.readObject();
                 }
                 pw.close();
-                br.close();
+                br.close();*/
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                recv_item = ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
