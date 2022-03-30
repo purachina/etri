@@ -65,7 +65,7 @@ public class Communicate {
             if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                pw.println("sending object");
+                pw.print("sending object");
                 pw.flush();
                 pw.close();
                 while(true) {
@@ -108,7 +108,7 @@ public class Communicate {
                     ans += (char)ch;
                 }
                 if (ans.equals("sending object")) {
-                    pw.println("gotit");
+                    pw.print("gotit");
                     pw.flush();
                     ObjectInputStream ois =
                     new ObjectInputStream(socket.getInputStream());
@@ -137,9 +137,10 @@ public class Communicate {
                 ans += (char)ch;
                 System.out.println(ans);
             }
+            System.out.println(ans + "end");
             if (ans.equals("asdf")) {
                 System.out.println("Handshake authed");
-                pw.println("OK");
+                pw.print("OK");
                 pw.flush();
                 while(true) {
                     ans = "";
@@ -165,7 +166,7 @@ public class Communicate {
             BufferedReader br =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String ans;
-            pw.println("asdf");
+            pw.print("asdf");
             pw.flush();
             while(true) {
                 ans = "";
@@ -175,7 +176,7 @@ public class Communicate {
             }
             if (ans.equals("OK")) {
                 System.out.println("Handshake authed");
-                pw.println(tar);
+                pw.print(tar);
                 pw.flush();
             }
             pw.close();
