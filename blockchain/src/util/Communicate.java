@@ -56,7 +56,6 @@ public class Communicate {
     protected static int sendSomething(Socket socket, Object o) {
         try {
             String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
-            System.out.println(newnode);
             if (!node.contains(newnode)) {
                 synchronized(node) {
                     node.add(newnode);
