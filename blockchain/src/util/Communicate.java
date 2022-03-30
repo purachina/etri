@@ -61,15 +61,20 @@ public class Communicate {
                     node.add(new_node);
                 }
             }
-            if (o instanceof Block || o instanceof Transaction ||
-            o instanceof String ||
-            o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block) {
+            String ans;
+            if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                pw.print("sending object");
+                pw.println("sending object");
                 pw.flush();
                 pw.close();
-                if (br.readLine().equals("gotit")) {
+                while(true) {
+                    ans = "";
+                    int ch = br.read();
+                    if (ch < 0 || ch == '\n') break;
+                    ans += ch;
+                }
+                if (ans.equals("gotit")) {
                     ObjectOutputStream oos =
                     new ObjectOutputStream(socket.getOutputStream());
                     oos.writeObject(o);
@@ -91,12 +96,19 @@ public class Communicate {
     }
     protected static Object recvSomething(Socket socket) {
         Object recv_item = "";
+        String ans;
         try {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());
                 BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                if (br.readLine().equals("sending object")) {
-                    pw.print("gotit");
+                while(true) {
+                    ans = "";
+                    int ch = br.read();
+                    if (ch < 0 || ch == '\n') break;
+                    ans += ch;
+                }
+                if (ans.equals("sending object")) {
+                    pw.println("gotit");
                     pw.flush();
                     ObjectInputStream ois =
                     new ObjectInputStream(socket.getInputStream());
@@ -118,10 +130,23 @@ public class Communicate {
             PrintWriter pw = new PrintWriter(socket.getOutputStream());
             BufferedReader br =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            if (br.readLine().equals("asdf")) {
-                pw.print("OK");
+            while(true) {
+                ans = "";
+                int ch = br.read();
+                if (ch < 0 || ch == '\n') break;
+                ans += ch;
+            }
+            if (ans.equals("asdf")) {
+                System.out.println("Handshake authed");
+                pw.println("OK");
                 pw.flush();
-                ans = br.readLine();
+                while(true) {
+                    ans = "";
+                    int ch = br.read();
+                    if (ch < 0 || ch == '\n') break;
+                    ans += ch;
+                }
+                System.out.println(ans);
             }
             pw.close();
             br.close();
@@ -138,10 +163,18 @@ public class Communicate {
             PrintWriter pw = new PrintWriter(socket.getOutputStream());
             BufferedReader br =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            pw.print("asdf");
+            String ans;
+            pw.println("asdf");
             pw.flush();
-            if (br.readLine().equals("OK")) {
-                pw.print(tar);
+            while(true) {
+                ans = "";
+                int ch = br.read();
+                if (ch < 0 || ch == '\n') break;
+                ans += ch;
+            }
+            if (ans.equals("OK")) {
+                System.out.println("Handshake authed");
+                pw.println(tar);
                 pw.flush();
             }
             pw.close();
