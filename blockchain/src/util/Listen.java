@@ -22,6 +22,7 @@ public class Listen extends Thread {
         while (true) {
             try {
                 socket = server_sock.accept();
+                System.out.println(socket.getInetAddress().getHostAddress());
                 String needs = Communicate.ansHandshaking(socket);
                 if (needs.contains("hash-")) {
                     needs = needs.split("-")[1];

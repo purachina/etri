@@ -72,7 +72,7 @@ public class Communicate {
                     ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
-                    ans += ch;
+                    ans += (char)ch;
                 }
                 if (ans.equals("gotit")) {
                     ObjectOutputStream oos =
@@ -105,7 +105,7 @@ public class Communicate {
                     ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
-                    ans += ch;
+                    ans += (char)ch;
                 }
                 if (ans.equals("sending object")) {
                     pw.println("gotit");
@@ -134,7 +134,8 @@ public class Communicate {
                 ans = "";
                 int ch = br.read();
                 if (ch < 0 || ch == '\n') break;
-                ans += ch;
+                ans += (char)ch;
+                System.out.println(ans);
             }
             if (ans.equals("asdf")) {
                 System.out.println("Handshake authed");
@@ -144,7 +145,7 @@ public class Communicate {
                     ans = "";
                     int ch = br.read();
                     if (ch < 0 || ch == '\n') break;
-                    ans += ch;
+                    ans += (char)ch;
                 }
                 System.out.println(ans);
             }
@@ -170,7 +171,7 @@ public class Communicate {
                 ans = "";
                 int ch = br.read();
                 if (ch < 0 || ch == '\n') break;
-                ans += ch;
+                ans += (char)ch;
             }
             if (ans.equals("OK")) {
                 System.out.println("Handshake authed");
