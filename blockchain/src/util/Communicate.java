@@ -55,10 +55,11 @@ public class Communicate {
     }
     protected static int sendSomething(Socket socket, Object o) {
         try {
-            String new_node = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
-            if (!node.contains(new_node)) {
+            String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
+            System.out.println(newnode);
+            if (!node.contains(newnode)) {
                 synchronized(node) {
-                    node.add(new_node);
+                    node.add(newnode);
                 }
             }
             String ans;

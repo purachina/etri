@@ -66,6 +66,7 @@ public class ReqObj {
         if (Communicate.reqHandshaking(socket, "nodelist").equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
+                System.out.println("closing socket");
                 socket.close();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
