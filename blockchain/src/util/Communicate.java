@@ -74,6 +74,7 @@ public class Communicate {
                     ans = br.readLine();
                     if (ans.length() > 0) break;
                 }
+                System.out.println(ans);
                 if (ans.equals("gotit")) {
                     ObjectOutputStream oos =
                     new ObjectOutputStream(socket.getOutputStream());
@@ -97,6 +98,7 @@ public class Communicate {
     protected static Object recvSomething(Socket socket) {
         Object recv_item = "";
         String ans;
+        System.out.println(socket.getInetAddress().getHostAddress());
         try {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream());
                 BufferedReader br =
@@ -106,6 +108,7 @@ public class Communicate {
                     ans = br.readLine();
                     if (ans.length() > 0) break;
                 }
+                System.out.println(ans);
                 if (ans.equals("sending object")) {
                     pw.println("gotit");
                     pw.flush();

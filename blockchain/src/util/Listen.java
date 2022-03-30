@@ -44,6 +44,7 @@ public class Listen extends Thread {
                     Communicate.sendSomething(socket, BlockChain.getCurrentBlock());
                 }
                 else if (needs.equals("nodelist")) {
+                    System.out.println("send node list start!");
                     Communicate.sendSomething(socket, Communicate.getNodeList());
                 }
                 } catch (IOException e) {
