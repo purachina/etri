@@ -70,9 +70,8 @@ public class Communicate {
                 pw.close();
                 ans = "";
                 while(true) {
-                    int ch = br.read();
-                    if (ch < 0 || ch == '\n') break;
-                    ans += (char)ch;
+                    ans = br.readLine();
+                    if (ans.length() > 0) break;
                 }
                 if (ans.equals("gotit")) {
                     ObjectOutputStream oos =
@@ -103,9 +102,8 @@ public class Communicate {
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 ans = "";
                 while(true) {
-                    int ch = br.read();
-                    if (ch < 0 || ch == '\n') break;
-                    ans += (char)ch;
+                    ans = br.readLine();
+                    if (ans.length() > 0) break;
                 }
                 if (ans.equals("sending object")) {
                     pw.println("gotit");
@@ -132,10 +130,8 @@ public class Communicate {
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
             ans = "";
             while(true) {
-                int ch = br.read();
-                if (ch < 0 || ch == '\n') break;
-                ans += (char)ch;
-                System.out.println(ans);
+                ans = br.readLine();
+                if (ans.length() > 0) break;
             }
             System.out.println(ans + "end");
             if (ans.equals("asdf")) {
@@ -144,9 +140,8 @@ public class Communicate {
                 pw.flush();
                 ans = "";
                 while(true) {
-                    int ch = br.read();
-                    if (ch < 0 || ch == '\n') break;
-                    ans += (char)ch;
+                    ans = br.readLine();
+                    if (ans.length() > 0) break;
                 }
                 System.out.println(ans);
             }
@@ -170,9 +165,8 @@ public class Communicate {
             pw.flush();
             ans = "";
             while(true) {
-                int ch = br.read();
-                if (ch < 0 || ch == '\n') break;
-                ans += (char)ch;
+                ans = br.readLine();
+                if (ans.length() > 0) break;
             }
             if (ans.equals("OK")) {
                 System.out.println("Handshake authed");
