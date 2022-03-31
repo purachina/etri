@@ -114,6 +114,16 @@ public class ReqObj {
                 return (String) recv;
             }
         }
+        else {
+            try {
+                pw.close();
+                br.close();
+                socket.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         return null;
     }
     protected static class ReqThread extends Thread {
