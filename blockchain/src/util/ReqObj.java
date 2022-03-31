@@ -15,7 +15,6 @@ import core.Block;
 public class ReqObj {
     private static PrintWriter pw;
     private static BufferedReader br;
-    private static String myip = InetAddress.getLocalHost().getHostAddress();
     private static Socket makeSocket(String ip) {
         SocketAddress sock_addr = new InetSocketAddress(ip, 55555);
         Socket socket = new Socket();
@@ -135,7 +134,7 @@ public class ReqObj {
             this.needs = new String(needs);
         }
         public void run() {
-            if (tar_ip.equals(myip)) return;
+            if (tar_ip.equals(Communicate.myip)) return;
             System.out.println(tar_ip + " " + needs);
             if (needs.contains("hash-")) {
                 recv = reqHash(tar_ip, needs);

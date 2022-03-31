@@ -16,6 +16,12 @@ import util.ReqObj.ReqThread;
 
 public class Init {
     public static int init() {
+        try {
+            Communicate.myip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if (SerialIO.fileCheck()) {
             SerialIO.readbin();
         }
@@ -37,12 +43,7 @@ public class Init {
                     e.printStackTrace();
                 }
                 */
-                try {
-                    Communicate.addNode(InetAddress.getLocalHost().getHostAddress());
-                } catch (UnknownHostException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                Communicate.addNode(Communicate.myip);
                 return 0;
             }
             else {
