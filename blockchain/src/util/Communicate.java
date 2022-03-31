@@ -57,11 +57,6 @@ public class Communicate {
     protected static int sendSomething(Socket socket, Object o) {
         try {
             String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
-            if (!node.contains(newnode)) {
-                synchronized(node) {
-                    node.add(newnode);
-                }
-            }
             String ans;
             if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
                 /*PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
@@ -86,6 +81,11 @@ public class Communicate {
                 oos.writeObject(o);
                 oos.flush();
                 oos.close();
+                if (!node.contains(newnode)) {
+                    synchronized(node) {
+                        node.add(newnode);
+                    }
+                }
                 return 0;
             }
             else {

@@ -216,6 +216,7 @@ public class Block implements Serializable {
                                 coinbase_tx,
                                 this.getDifficulty());
                     }
+                    Consensus.initPoW();
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
                         if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
                             DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i),

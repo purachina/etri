@@ -171,9 +171,13 @@ public class Network {
             Communicate.sendSomething(socket, newblocks);
             ans = Communicate.ansHandshaking(socket, pw, br);
             if (ans.equals("accept")) {
+                System.out.println(socket.getInetAddress().getHostAddress() + " says yes");
                 Consensus.powAccept();
             }
-            else if (ans.equals("no")) Consensus.powDeny();
+            else if (ans.equals("no")) {
+                Consensus.powDeny(); 
+                System.out.println(socket.getInetAddress().getHostAddress() + " says no");  
+            }
             try {
                 pw.close();
                 br.close();

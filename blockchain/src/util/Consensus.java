@@ -58,7 +58,7 @@ public class Consensus {
     }
     public static boolean chkPoW() {
         while(true) {
-            if (aff + neg == Communicate.getNodeList().size()) {
+            if (aff + neg == Communicate.getNodeList().size() - 1) {
                 if (aff >= neg) return true;
                 return false;
             }
