@@ -26,12 +26,14 @@ public class Listen extends Thread {
     public void run() {
         while (true) {
             try {
+                System.out.println("listening...");
                 socket = server_sock.accept();
                 socket.setSoTimeout(10000);
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 System.out.println(socket.getInetAddress().getHostAddress());
                 String needs = Communicate.ansHandshaking(socket, pw, br);
+                System.out.println("sending...");
                 if (needs.contains("hash-")) {
                     needs = needs.split("-")[1];
                     if (needs.equals("blockchain")) {
@@ -54,6 +56,9 @@ public class Listen extends Thread {
                     System.out.println("send node list start!");
                     Communicate.sendSomething(socket, Communicate.getNodeList());
                 }
+                pw.close();
+                br.close();
+                socket.close();
                 } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

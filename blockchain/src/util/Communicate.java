@@ -89,7 +89,6 @@ public class Communicate {
             }
             else {
                 System.out.println("you cannot send this obj");
-                socket.close();
                 return 1;
             }
         } catch (IOException e) {
