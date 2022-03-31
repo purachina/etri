@@ -133,6 +133,7 @@ public class ReqObj {
             this.needs = new String(needs);
         }
         public void run() {
+            System.out.println(tar_ip + " " + needs);
             if (needs.contains("hash-")) {
                 recv = reqHash(tar_ip, needs);
                 if (recv != null && recv instanceof String) {
