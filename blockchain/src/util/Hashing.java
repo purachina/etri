@@ -30,7 +30,7 @@ public class Hashing {
     public static String makeHash(ArrayList tar) {
         String ret = "";
         if (tar.get(0) instanceof Block) {
-            for (int i = 0; i < tar.size(); i++) {
+            for (int i = 0; i < tar.size() - 1; i++) {
                 ret += ((Block)tar.get(i)).getBlockHash();
             }
         }
