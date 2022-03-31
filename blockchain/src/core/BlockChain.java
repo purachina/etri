@@ -51,6 +51,34 @@ public class BlockChain extends Thread {
         }
         return 0;
     }
+    private static boolean newBlockCheck(Block cblock, Block newblock) {
+        if (cblock.getNumberofTX() != newblock.getNumberofTX()) return false;
+        if (cblock.getDifficulty().equals(newblock.getDifficulty())) {
+            if (newblock.getBlockHash().substring(0, newblock.getDifficulty().length()).compareTo(newblock.getDifficulty()) <= 0) {
+                if (new Block(newblock).getAvailable()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static int acceptBlock(Object recv) {
+        int ret = 1;
+        synchronized(blockchain) {
+            if (recv instanceof ArrayList) {
+                if (((ArrayList)recv).get(0) instanceof Block && ((ArrayList)recv).get(1) instanceof Block) {
+                    ArrayList<Block> newblocks = (ArrayList<Block>) recv;
+                    if (newBlockCheck(cblock, newblocks.get(0))) {
+                        cblock = newblocks.get(0);
+                        blockchain.add(newblocks.get(1));
+                        cblock = blockchain.get(blockchain.size() - 1);
+                        ret = 0;
+                    }
+                }
+            }
+        }
+        return ret;
+    }
     public static class MiningThread extends Thread {
         public void run() {
             while(true) {
@@ -71,7 +99,7 @@ public class BlockChain extends Thread {
         if (blockchain.size() == 0) blockchain.add(new Block());
         cblock = blockchain.get(blockchain.size() - 1);
         while(true) {
-            Transaction coinbase_tx = new Transaction();
+            Transaction coinbase_tx = new Transaction(Communicate.myip, Communicate.myip, "123");
             Block newblock = cblock.mine(coinbase_tx);
             if (newblock != null) {
                 synchronized (blockchain) {

@@ -26,6 +26,12 @@ public class Listen extends Thread {
     public void run() {
         while (true) {
             try {
+                try {
+                    server_sock.setSoTimeout(1000);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    System.out.println("asdf");
+                }
                 System.out.println("listening...");
                 socket = server_sock.accept();
                 socket.setSoTimeout(10000);
@@ -57,12 +63,21 @@ public class Listen extends Thread {
                     System.out.println("send node list start!");
                     Communicate.sendSomething(socket, Communicate.getNodeList());
                 }
+                else if (needs.equals("sendblock")) {
+                    Object recv = Communicate.recvSomething(socket);
+                    BlockChain.acceptBlock(recv);
+                }
+                else if (needs.equals("sendtx")) {
+
+                }
                 pw.close();
                 br.close();
                 socket.close();
                 } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+            }
+            if (UserControl.closechk == true) {
+                break;
             }
         }
     }

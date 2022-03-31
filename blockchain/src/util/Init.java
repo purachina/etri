@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import core.Block;
 import core.BlockChain;
-import util.ReqObj.ReqThread;
+import util.Network.ReqThread;
 
 public class Init {
     public static int init() {
@@ -47,13 +47,13 @@ public class Init {
                 return 0;
             }
             else {
-                ArrayList<String> tmpnode = ReqObj.reqNodeList(server_ip);
+                ArrayList<String> tmpnode = Network.reqNodeList(server_ip);
                 if (tmpnode == null) {
                     System.out.println("ip list request error");
                     return 1;
                 }
                 Communicate.setNodeList(tmpnode);
-                ArrayList<Block> tmpbc = ReqObj.reqBlockchain(server_ip);
+                ArrayList<Block> tmpbc = Network.reqBlockchain(server_ip);
                 if (tmpbc == null) {
                     System.out.println("blockchain request error");
                     return 2;

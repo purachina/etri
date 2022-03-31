@@ -2,8 +2,11 @@ package core;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import util.Communicate;
 import util.Hashing;
+import util.Network;
 import util.UserControl;
+import util.Network.DistributeBlockThread;
 
 public class Block implements Serializable {
     private String pre_block_hash, blockhash, merkleroot, difficulty;
@@ -122,6 +125,13 @@ public class Block implements Serializable {
         synchronized(this) {ret = timestamp;}
         return ret;
     }
+    public int getNumberofTX() {
+        int ret;
+        synchronized(this) {
+            ret = merkletree.getTXList().size();
+        }
+        return ret;
+    }
     public int printBlock() {
         synchronized (this) {
             this.refresh();
@@ -180,27 +190,34 @@ public class Block implements Serializable {
                 if (UserControl.closechk == true) return null;
                 if (this.getBlockHash().substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
                     time = System.currentTimeMillis() - time;
+                    Block ret;
                     if (time < 6000) {
-                        return new Block(
+                        ret = new Block(
                                 this,
                                 this.getBlockID() + 1,
                                 this.getNonce(),
                                 coinbase_tx,
                                 this.getDifficulty() + "0");
-                    } else if (time > 7000) {
-                        return new Block(
+                    }
+                    else if (time > 7000) {
+                        ret = new Block(
                                 this,
                                 this.getBlockID() + 1,
                                 this.getNonce(),
                                 coinbase_tx,
                                 this.getDifficulty().substring(1));
-                    } else {
-                        return new Block(
+                    }
+                    else {
+                        ret = new Block(
                                 this,
                                 this.getBlockID() + 1,
                                 this.getNonce(),
                                 coinbase_tx,
                                 this.getDifficulty());
+                    }
+                    for (int i = 0; i < Communicate.getNodeList().size(); i++) {
+                        DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i), this, ret);
+                        dbt.start();
                     }
                 }
                 nonce++;

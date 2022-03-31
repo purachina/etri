@@ -11,8 +11,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import core.Block;
+import core.Transaction;
 
-public class ReqObj {
+public class Network {
     private static PrintWriter pw;
     private static BufferedReader br;
     private static Socket makeSocket(String ip) {
@@ -126,25 +127,26 @@ public class ReqObj {
         }
         return null;
     }
+
     protected static class ReqThread extends Thread {
-        String tar_ip, needs, ans;
+        String target_ip, needs, ans;
         Object recv;
-        public ReqThread(String tar_ip, String needs) {
-            this.tar_ip = new String(tar_ip);
+        public ReqThread(String target_ip, String needs) {
+            this.target_ip = new String(target_ip);
             this.needs = new String(needs);
         }
         public void run() {
-            if (tar_ip.equals(Communicate.myip)) return;
-            System.out.println(tar_ip + " " + needs);
+            if (target_ip.equals(Communicate.myip)) return;
+            System.out.println(target_ip + " " + needs);
             if (needs.contains("hash-")) {
-                recv = reqHash(tar_ip, needs);
+                recv = reqHash(target_ip, needs);
                 if (recv != null && recv instanceof String) {
-                    System.out.println((String)recv + " " + tar_ip);
-                    Consensus.addHash((String)recv, tar_ip);
+                    System.out.println((String)recv + " " + target_ip);
+                    Consensus.addHash((String)recv, target_ip);
                 }
             }
             else if (needs.equals("blockchain")) {
-                recv = reqBlockchain(tar_ip);
+                recv = reqBlockchain(target_ip);
                 if (recv != null && recv instanceof ArrayList) {
                     if (((ArrayList)recv).get(0) instanceof Block) {
 
@@ -152,11 +154,56 @@ public class ReqObj {
                 }
             }
             else if (needs.equals("block")) {
-                recv = reqBlock(tar_ip);
+                recv = reqBlock(target_ip);
             }
             else if (needs.equals("nodelist")) {
-                recv = reqNodeList(tar_ip);
+                recv = reqNodeList(target_ip);
             }
+        }
+    }
+
+        
+    protected static int sendBlock(String ip, ArrayList<Block> newblocks) {
+        Socket socket = makeSocket(ip);
+        if (socket == null) return 1;
+        String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
+        if (ans.equals("OK")) {
+            Communicate.sendSomething(socket, newblocks);
+            try {
+                pw.close();
+                br.close();
+                socket.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return 0;
+        }
+        else {
+            try {
+                pw.close();
+                br.close();
+                socket.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return 1;
+    }
+
+    public static class DistributeBlockThread extends Thread {
+        private String target_ip;
+        private ArrayList<Block> newblocks;
+        public DistributeBlockThread(String target_ip, Block target_block, Block next_block) {
+            this.target_ip = target_ip;
+            newblocks = new ArrayList<Block>();
+            newblocks.add(target_block);
+            newblocks.add(next_block);
+        }
+        public void run() {
+            if (target_ip.equals(Communicate.myip)) return;
+            sendBlock(target_ip, newblocks);
         }
     }
 }

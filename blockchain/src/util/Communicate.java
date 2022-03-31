@@ -14,7 +14,7 @@ import core.Transaction;
 
 public class Communicate {
     private static ArrayList<String> node = new ArrayList<String>();
-    protected static String myip;
+    public static String myip;
     private static ArrayList<String> recv_hash = new ArrayList<String>();
     protected static int removeNode(String target) {
         synchronized(node) {

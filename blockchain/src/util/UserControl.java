@@ -33,6 +33,7 @@ public class UserControl extends Thread {
             } 
             else if (ans.equals("cls")) {
                 closechk = true;
+                sc.close();
                 return;
             }
             else if (ans.equals("save")) {
