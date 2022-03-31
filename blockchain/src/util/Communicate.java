@@ -165,7 +165,7 @@ public class Communicate {
             pw.println("asdf");
             pw.flush();
             ans = "";
-            System.out.println(tar + "Handshaking...")
+            System.out.println(tar + "Handshaking...");
             while(true) {
                 ans = br.readLine();
                 if (ans.length() > 0) break;
