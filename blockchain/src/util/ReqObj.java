@@ -88,6 +88,7 @@ public class ReqObj {
             if (recv instanceof ArrayList) {
                 if (((ArrayList)recv).get(0) instanceof String) {
                     ArrayList<String>tmp = (ArrayList<String>)recv;
+                    System.out.println("this is received stuff");
                     for (int i = 0; i < tmp.size(); i++) System.out.println(tmp.get(i));
                     return (ArrayList<String>)recv;
                 }
