@@ -19,10 +19,10 @@ public class ReqObj {
         SocketAddress sock_addr = new InetSocketAddress(ip, 55555);
         Socket socket = new Socket();
         try {
-            pw = new PrintWriter(socket.getOutputStream());
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             socket.setSoTimeout(10000);
             socket.connect(sock_addr, 5000);
+            pw = new PrintWriter(socket.getOutputStream());
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             return socket;
         } catch (IOException e) {
             // TODO Auto-generated catch block
