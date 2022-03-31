@@ -219,6 +219,7 @@ public class Block implements Serializable {
                         DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i), this, ret);
                         dbt.start();
                     }
+                    return ret;
                 }
                 nonce++;
             }
