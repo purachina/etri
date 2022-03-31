@@ -53,6 +53,7 @@ public class Init {
                 }
                 Communicate.setNodeList(tmpnode);
                 ArrayList<Block> tmpbc = ReqObj.reqBlockchain(server_ip);
+                System.out.println((tmpbc.get(0)).printBlock());
                 if (tmpbc == null) {
                     System.out.println("blockchain request error");
                     return 2;
