@@ -36,6 +36,7 @@ public class Consensus {
                     }
                     if (vote.get(i).compareTo(vote.get(sel)) > 0) sel = i;
                 }
+                System.out.println(sel + " " + candidate_list.get(sel));
                 for (int i = 0; i < network_hash.size(); i++) {
                     if (!network_hash.get(i).equals(candidate_list.get(sel))) {
                         removeCheater(network_hash.get(i));
