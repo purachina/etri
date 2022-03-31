@@ -216,8 +216,11 @@ public class Block implements Serializable {
                                 this.getDifficulty());
                     }
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
-                        DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i), this, ret);
-                        dbt.start();
+                        if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
+                            DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i),
+                                    this, ret);
+                            dbt.start();
+                        }
                     }
                     return ret;
                 }
