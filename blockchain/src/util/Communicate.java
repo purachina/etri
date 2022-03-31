@@ -170,7 +170,7 @@ public class Communicate {
                 if (ans.length() > 0) break;
             }
             if (ans.equals("OK")) {
-                System.out.println("Handshake authed");
+                System.out.println(tar + "Handshake authed");
                 pw.println(tar);
                 pw.flush();
             }
