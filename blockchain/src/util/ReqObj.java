@@ -136,6 +136,7 @@ public class ReqObj {
             if (needs.contains("hash-")) {
                 recv = reqHash(tar_ip, needs);
                 if (recv != null && recv instanceof String) {
+                    System.out.println((String)recv + " " + tar_ip);
                     Consensus.addHash((String)recv, tar_ip);
                 }
             }
