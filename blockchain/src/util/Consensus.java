@@ -9,11 +9,6 @@ public class Consensus {
     public static String hashElection() {
         synchronized (network_hash) {
             synchronized (owner_ip) {
-
-                if (network_hash.size() != Communicate.getNodeList().size()) {
-                    System.out.println("there's a difference between received stuff and count of node");
-                    return "";
-                }
                 ArrayList<String> candidate_list = new ArrayList<String>();
                 ArrayList<Integer> vote = new ArrayList<Integer>();
                 for (int i = 0; i < network_hash.size(); i++) {
