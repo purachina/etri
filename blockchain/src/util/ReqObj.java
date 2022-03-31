@@ -1,6 +1,9 @@
 package util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -10,10 +13,14 @@ import java.util.ArrayList;
 import core.Block;
 
 public class ReqObj {
+    private static PrintWriter pw;
+    private static BufferedReader br;
     private static Socket makeSocket(String ip) {
         SocketAddress sock_addr = new InetSocketAddress(ip, 55555);
         Socket socket = new Socket();
         try {
+            pw = new PrintWriter(socket.getOutputStream());
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             socket.setSoTimeout(10000);
             socket.connect(sock_addr, 5000);
             return socket;
@@ -29,9 +36,11 @@ public class ReqObj {
     protected static ArrayList<Block> reqBlockchain(String ip) {
         Socket socket = makeSocket(ip);
         if (socket == null) return null;
-        if (Communicate.reqHandshaking(socket, "blockchain").equals("OK")) {
+        if (Communicate.reqHandshaking(socket, "blockchain", pw, br).equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
+                pw.close();
+                br.close();
                 socket.close();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -48,9 +57,11 @@ public class ReqObj {
     protected static Block reqBlock(String ip) {
         Socket socket = makeSocket(ip);
         if (socket == null) return null;
-        if (Communicate.reqHandshaking(socket, "block").equals("OK")) {
+        if (Communicate.reqHandshaking(socket, "block", pw, br).equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
+                pw.close();
+                br.close();
                 socket.close();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -63,10 +74,12 @@ public class ReqObj {
     protected static ArrayList<String> reqNodeList(String ip) {
         Socket socket = makeSocket(ip);
         if (socket == null) return null;
-        if (Communicate.reqHandshaking(socket, "nodelist").equals("OK")) {
+        if (Communicate.reqHandshaking(socket, "nodelist", pw, br).equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
                 System.out.println("closing socket");
+                pw.close();
+                br.close();
                 socket.close();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -85,17 +98,19 @@ public class ReqObj {
         String ans = "";
         if (socket == null) return null;
         if (needs.equals("blockchain")) {
-            ans = Communicate.reqHandshaking(socket, "hash-blockchain");
+            ans = Communicate.reqHandshaking(socket, "hash-blockchain", pw, br);
         }
         else if (needs.equals("block")) {
-            ans = Communicate.reqHandshaking(socket, "hash-block");
+            ans = Communicate.reqHandshaking(socket, "hash-block", pw, br);
         }
         else if (needs.equals("nodelist")) {
-            ans = Communicate.reqHandshaking(socket, "hash-nodelist");
+            ans = Communicate.reqHandshaking(socket, "hash-nodelist", pw, br);
         }
         if (ans.equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
+                pw.close();
+                br.close();
                 socket.close();
             } catch (IOException e) {
                 // TODO Auto-generated catch block

@@ -123,6 +123,7 @@ public class Communicate {
                 br.close();*/
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 recv_item = ois.readObject();
+                ois.close();
             } catch (IOException | ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -131,12 +132,9 @@ public class Communicate {
         return recv_item;
     }
 
-    protected static String ansHandshaking(Socket socket) {
+    protected static String ansHandshaking(Socket socket, PrintWriter pw, BufferedReader br) {
         String ans = "";
         try {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream());
-            BufferedReader br =
-            new BufferedReader(new InputStreamReader(socket.getInputStream()));
             ans = "";
             while(true) {
                 ans = br.readLine();
@@ -154,8 +152,6 @@ public class Communicate {
                 }
                 System.out.println(ans);
             }
-            pw.close();
-            br.close();
             return ans;
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -164,11 +160,8 @@ public class Communicate {
         System.out.println("AH error");
         return ans;
     }
-    protected static String reqHandshaking(Socket socket, String tar) {
+    protected static String reqHandshaking(Socket socket, String tar, PrintWriter pw, BufferedReader br) {
         try {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream());
-            BufferedReader br =
-            new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String ans;
             pw.println("asdf");
             pw.flush();
@@ -182,8 +175,6 @@ public class Communicate {
                 pw.println(tar);
                 pw.flush();
             }
-            pw.close();
-            br.close();
             return "OK";
         } catch (IOException e) {
             // TODO Auto-generated catch block
