@@ -39,6 +39,7 @@ public class ReqObj {
         if (Communicate.reqHandshaking(socket, "blockchain", pw, br).equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             System.out.println(recv.getClass().getName());
+            System.out.println((((ArrayList)recv).get(0)).getClass().getName());
             try {
                 pw.close();
                 br.close();
