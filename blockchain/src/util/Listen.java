@@ -32,7 +32,6 @@ public class Listen extends Thread {
                     // TODO Auto-generated catch block
                     System.out.println("asdf");
                 }
-                System.out.println("listening...");
                 socket = server_sock.accept();
                 socket.setSoTimeout(10000);
                 pw = new PrintWriter(socket.getOutputStream());
