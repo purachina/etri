@@ -21,6 +21,14 @@ public class Consensus {
                     else {vote.set(idx, vote.get(idx) + 1);}
                 }
                 int sel = 0;
+                for (int i = 0; i < candidate_list.size(); i++) {
+                    System.out.print(candidate_list.get(i) + " ");
+                }
+                System.out.println();
+                for (int i = 0; i < vote.size(); i++) {
+                    System.out.print(vote.get(i) + " ");
+                }
+                System.out.println();
                 for (int i = 0; i < vote.size(); i++) {
                     if (vote.get(i).compareTo(network_hash.size() + 1 / 2) > 0) {
                         sel = i;
