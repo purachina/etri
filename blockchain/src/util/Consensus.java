@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Consensus {
     protected static ArrayList<String> network_hash = new ArrayList<String>();
     protected static ArrayList<String> owner_ip = new ArrayList<String>();
-
+    protected static int aff, neg;
     public static String hashElection() {
         synchronized (network_hash) {
             synchronized (owner_ip) {
@@ -44,6 +44,23 @@ public class Consensus {
                 }
                 
                 return candidate_list.get(sel);
+            }
+        }
+    }
+    public static void initPoW() {
+        aff = neg = 0;
+    }
+    public static void powAccept() {
+        aff++;
+    }
+    public static void powDeny() {
+        neg++;
+    }
+    public static boolean chkPoW() {
+        while(true) {
+            if (aff + neg == Communicate.getNodeList().size()) {
+                if (aff >= neg) return true;
+                return false;
             }
         }
     }

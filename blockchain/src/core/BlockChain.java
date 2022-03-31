@@ -68,7 +68,7 @@ public class BlockChain extends Thread {
             if (recv instanceof ArrayList) {
                 if (((ArrayList)recv).get(0) instanceof Block && ((ArrayList)recv).get(1) instanceof Block) {
                     ArrayList<Block> newblocks = (ArrayList<Block>) recv;
-                    if (newBlockCheck(cblock, newblocks.get(0))) {
+                    if (newBlockCheck(cblock, newblocks.get(0)) && newblocks.get(0).getPreBlockHash().equals(cblock.getPreBlockHash())) {
                         cblock = newblocks.get(0);
                         blockchain.add(newblocks.get(1));
                         cblock = blockchain.get(blockchain.size() - 1);

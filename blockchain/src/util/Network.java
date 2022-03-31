@@ -169,6 +169,11 @@ public class Network {
         String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
         if (ans.equals("OK")) {
             Communicate.sendSomething(socket, newblocks);
+            ans = Communicate.ansHandshaking(socket, pw, br);
+            if (ans.equals("accept")) {
+                Consensus.powAccept();
+            }
+            else if (ans.equals("no")) Consensus.powDeny();
             try {
                 pw.close();
                 br.close();

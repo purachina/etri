@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import util.Communicate;
+import util.Consensus;
 import util.Hashing;
 import util.Network;
 import util.UserControl;
@@ -222,7 +223,7 @@ public class Block implements Serializable {
                             dbt.start();
                         }
                     }
-                    return ret;
+                    if (Consensus.chkPoW()) return ret;
                 }
                 nonce++;
             }

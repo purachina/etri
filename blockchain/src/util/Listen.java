@@ -64,7 +64,10 @@ public class Listen extends Thread {
                 }
                 else if (needs.equals("sendblock")) {
                     Object recv = Communicate.recvSomething(socket);
-                    BlockChain.acceptBlock(recv);
+                    if (BlockChain.acceptBlock(recv) == 0) {
+                        Communicate.reqHandshaking(socket, "accept", pw, br);
+                    }
+                    else Communicate.reqHandshaking(socket, "no", pw, br);
                 }
                 else if (needs.equals("sendtx")) {
 
