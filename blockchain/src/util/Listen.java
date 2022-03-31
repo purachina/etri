@@ -38,6 +38,7 @@ public class Listen extends Thread {
                     needs = needs.split("-")[1];
                     if (needs.equals("blockchain")) {
                         Communicate.sendSomething(socket, Hashing.makeHash(BlockChain.getBlockChain()));
+                        System.out.println(Hashing.makeHash(BlockChain.getBlockChain()));
                     }
                     else if (needs.equals("block")) {
                         Communicate.sendSomething(socket, BlockChain.getCurrentBlock().getBlockHash());

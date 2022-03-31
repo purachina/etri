@@ -70,6 +70,7 @@ public class Init {
                 }
                 String netres = Consensus.hashElection();
                 String recvbchash = Hashing.makeHash(tmpbc);
+                System.out.println(recvbchash);
                 if (netres.equals(recvbchash)) {
                     BlockChain.setBlockchain(tmpbc);
                 } else {
