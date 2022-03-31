@@ -98,17 +98,8 @@ public class ReqObj {
     }
     protected static String reqHash(String ip, String needs) {
         Socket socket = makeSocket(ip);
-        String ans = "";
         if (socket == null) return null;
-        if (needs.equals("blockchain")) {
-            ans = Communicate.reqHandshaking(socket, "hash-blockchain", pw, br);
-        }
-        else if (needs.equals("block")) {
-            ans = Communicate.reqHandshaking(socket, "hash-block", pw, br);
-        }
-        else if (needs.equals("nodelist")) {
-            ans = Communicate.reqHandshaking(socket, "hash-nodelist", pw, br);
-        }
+        String ans = Communicate.reqHandshaking(socket, needs, pw, br);
         if (ans.equals("OK")) {
             Object recv = Communicate.recvSomething(socket);
             try {
