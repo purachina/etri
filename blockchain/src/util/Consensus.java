@@ -14,6 +14,7 @@ public class Consensus {
                 for (int i = 0; i < network_hash.size(); i++) {
                     int idx = candidate_list.indexOf(network_hash.get(i));
                     if (idx < 0) {
+                        System.out.println(network_hash.get(i));
                         candidate_list.add(network_hash.get(i));
                         vote.add(1);
                     } 
