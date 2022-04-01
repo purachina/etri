@@ -55,7 +55,7 @@ public class Consensus {
     }
     public static void powDeny() {
         neg++;
-    }
+    } 
     public static boolean chkPoW() {
         return true;/*
         while(true) {
