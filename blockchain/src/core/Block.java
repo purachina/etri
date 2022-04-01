@@ -192,14 +192,15 @@ public class Block implements Serializable {
     }
 
     public Block mine(Transaction coinbase_tx) {
-        long time = System.currentTimeMillis();
+        //long time = System.currentTimeMillis();
         while (true) {
             synchronized (this) {
                 if (UserControl.closechk == true) return null;
                 if (this.getBlockHash().substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
                     System.out.println("block mined!!!");
-                    time = System.currentTimeMillis() - time;
+                    //time = System.currentTimeMillis() - time;
                     Block ret;
+                    /*
                     if (time < 6000) {
                         ret = new Block(
                                 this,
@@ -223,7 +224,13 @@ public class Block implements Serializable {
                                 this.getNonce(),
                                 coinbase_tx,
                                 this.getDifficulty());
-                    }
+                    }*/
+                    ret = new Block(
+                                this,
+                                this.getBlockID() + 1,
+                                this.getNonce(),
+                                coinbase_tx,
+                                "00000");
                     Consensus.initPoW();
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
                         if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {

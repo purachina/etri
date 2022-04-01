@@ -6,6 +6,7 @@ import util.Communicate;
 import util.Init;
 import util.SerialIO;
 import util.UserControl;
+import util.Network.DistributeBlockThread;
 public class BlockChain extends Thread {
     private static Block cblock;
     private static ArrayList<Block> blockchain = new ArrayList<Block>();
@@ -82,7 +83,7 @@ public class BlockChain extends Thread {
             }
         }
         return ret;
-    }
+    }/*
     public static class MiningThread extends Thread {
         public void run() {
             while(true) {
@@ -98,20 +99,32 @@ public class BlockChain extends Thread {
             }
         }
     }
+    */
     public void run() {
         if (blockchain == null) blockchain = new ArrayList<Block>();
         if (blockchain.size() == 0) blockchain.add(new Block());
         cblock = blockchain.get(blockchain.size() - 1);
         while(true) {
             Transaction coinbase_tx = new Transaction(Communicate.myip, Communicate.myip, "123");
-            Block newblock = cblock.mine(coinbase_tx);
-            if (newblock != null) {
-                synchronized (blockchain) {
-                    blockchain.add(newblock);
-                    cblock = newblock;
+            while(true) {
+                synchronized (cblock) {
+                    cblock = blockchain.get(blockchain.size() - 1);
+                    if (UserControl.closechk == true) return;
+                    if (cblock.getBlockHash().substring(0, cblock.getDifficulty().length()).compareTo(cblock.getDifficulty()) <= 0) {
+                        System.out.println("block mined!!!");
+                        Block newblock = new Block(cblock, cblock.getBlockID() + 1, 0, coinbase_tx, "00000");
+                        
+                        for (int i = 0; i < Communicate.getNodeList().size(); i++) {
+                            if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
+                                System.out.println("distributing this block to " + Communicate.getNodeList().get(i));
+                                DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i), new Block(cblock), new Block(newblock));
+                                dbt.start();
+                            }
+                            blockchain.add(newblock);
+                        }
+                    }
                 }
             }
-            if (UserControl.closechk == true) return;
         }
     }
 }
