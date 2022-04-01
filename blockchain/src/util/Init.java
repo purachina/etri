@@ -64,7 +64,7 @@ public class Init {
                     rt.start();
                 }
                 try {
-                    Thread.sleep(15100);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
