@@ -175,6 +175,13 @@ public class Block implements Serializable {
         return target.getBlockHash().equals(this.getBlockHash());
     }
 
+    public boolean chkRecvBlock(Block recv) {
+        recv.refresh();
+        if (!recv.getDifficulty().equals(this.getDifficulty())) return false;
+        if (recv.getBlockHash().substring(0, this.getDifficulty().length()).compareTo(this.getDifficulty()) <= 0) return true;
+        return false;
+    }
+
     public void addTX(Transaction newtx) {
         synchronized(this) {
             this.merkletree.addTX(newtx);
