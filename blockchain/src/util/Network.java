@@ -3,6 +3,8 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -16,6 +18,8 @@ import core.Transaction;
 public class Network {
     private static PrintWriter pw;
     private static BufferedReader br;
+    private static ObjectInputStream ois;
+    private static ObjectOutputStream oos;
     private static Socket makeSocket(String ip) throws IOException {
         SocketAddress sock_addr = new InetSocketAddress(ip, 55555);
         Socket socket = new Socket();
@@ -23,6 +27,8 @@ public class Network {
         socket.connect(sock_addr, 5000);
         pw = new PrintWriter(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        oos = new ObjectOutputStream(socket.getOutputStream());
+        ois = new ObjectInputStream(socket.getInputStream());
         return socket;
         /*
         try {
@@ -54,10 +60,12 @@ public class Network {
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 if (Communicate.reqHandshaking(socket, "blockchain", pw, br).equals("OK")) {
-                    Object recv = Communicate.recvSomething(socket);
+                    Object recv = Communicate.recvSomething(socket, ois);
                     try {
                         pw.close();
                         br.close();
+                        oos.close();
+                        ois.close();
                         socket.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -96,10 +104,12 @@ public class Network {
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 if (Communicate.reqHandshaking(socket, "block", pw, br).equals("OK")) {
-                    Object recv = Communicate.recvSomething(socket);
+                    Object recv = Communicate.recvSomething(socket, ois);
                     try {
                         pw.close();
                         br.close();
+                        oos.close();
+                        ois.close();
                         socket.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -137,7 +147,7 @@ public class Network {
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 if (Communicate.reqHandshaking(socket, "nodelist", pw, br).equals("OK")) {
-                    Object recv = Communicate.recvSomething(socket);
+                    Object recv = Communicate.recvSomething(socket, ois);
                     try {
                         System.out.println("closing socket");
                         pw.close();
@@ -182,7 +192,7 @@ public class Network {
                 socket = makeSocket(ip);
                 String ans = Communicate.reqHandshaking(socket, needs, pw, br);
                 if (ans.equals("OK")) {
-                    Object recv = Communicate.recvSomething(socket);
+                    Object recv = Communicate.recvSomething(socket, ois);
                     try {
                         pw.close();
                         br.close();
@@ -200,6 +210,8 @@ public class Network {
                     try {
                         pw.close();
                         br.close();
+                        oos.close();
+                        ois.close();
                         socket.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -265,7 +277,7 @@ public class Network {
                 socket = makeSocket(ip);
                 String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
                 if (ans.equals("OK")) {
-                    Communicate.sendSomething(socket, newblocks);
+                    Communicate.sendSomething(socket, newblocks, oos);
                     socket = makeSocket(ip);
                     ans = Communicate.ansHandshaking(socket, pw, br);
                     if (ans.equals("accept")) {
@@ -279,6 +291,8 @@ public class Network {
                     try {
                         pw.close();
                         br.close();
+                        ois.close();
+                        oos.close();
                         socket.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block

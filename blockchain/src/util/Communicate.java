@@ -54,7 +54,7 @@ public class Communicate {
         }
         return 0;
     }
-    protected static int sendSomething(Socket socket, Object o) {
+    protected static int sendSomething(Socket socket, Object o, ObjectOutputStream oos) {
         try {
             String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
             String ans;
@@ -77,11 +77,9 @@ public class Communicate {
                     oos.flush();
                     oos.close();
                 }*/
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(o);
                 oos.flush();
                 System.out.println("Send " + o.getClass().getName() + " to " + newnode);
-                oos.close();
                 if (!node.contains(newnode)) {
                     synchronized(node) {
                         node.add(newnode);
@@ -99,7 +97,7 @@ public class Communicate {
         System.out.println("something was wrong with send process");
         return 1000;
     }
-    protected static Object recvSomething(Socket socket) {
+    protected static Object recvSomething(Socket socket, ObjectInputStream ois) {
         Object recv_item = "";
         String ans;
         try {
@@ -121,9 +119,7 @@ public class Communicate {
                 }
                 pw.close();
                 br.close();*/
-                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 recv_item = ois.readObject();
-                ois.close();
             } catch (IOException | ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

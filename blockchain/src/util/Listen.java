@@ -3,6 +3,8 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -15,6 +17,8 @@ public class Listen extends Thread {
     Socket socket;
     PrintWriter pw;
     BufferedReader br;
+    ObjectOutputStream oos;
+    ObjectInputStream ois;
     public Listen() {
         try {
             server_sock = new ServerSocket(55555);
@@ -31,34 +35,36 @@ public class Listen extends Thread {
                 socket.setSoTimeout(10000);
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
                 System.out.println(socket.getInetAddress().getHostAddress());
                 String needs = Communicate.ansHandshaking(socket, pw, br);
                 System.out.println("sending...");
                 if (needs.contains("hash-")) {
                     needs = needs.split("-")[1];
                     if (needs.equals("blockchain")) {
-                        Communicate.sendSomething(socket, Hashing.makeHash(BlockChain.getBlockChain()));
+                        Communicate.sendSomething(socket, Hashing.makeHash(BlockChain.getBlockChain()), oos);
                         System.out.println(Hashing.makeHash(BlockChain.getBlockChain()));
                     }
                     else if (needs.equals("block")) {
-                        Communicate.sendSomething(socket, BlockChain.getCurrentBlock().getBlockHash());
+                        Communicate.sendSomething(socket, BlockChain.getCurrentBlock().getBlockHash(), oos);
                     }
                     else if (needs.equals("nodelist")) {
-                        Communicate.sendSomething(socket, Hashing.makeHash(Communicate.getNodeList()));
+                        Communicate.sendSomething(socket, Hashing.makeHash(Communicate.getNodeList()), oos);
                     }
                 }
                 else if (needs.equals("blockchain")) {
-                    Communicate.sendSomething(socket, BlockChain.getBlockChain());
+                    Communicate.sendSomething(socket, BlockChain.getBlockChain(), oos);
                 }
                 else if (needs.equals("block")) {
-                    Communicate.sendSomething(socket, BlockChain.getCurrentBlock());
+                    Communicate.sendSomething(socket, BlockChain.getCurrentBlock(), oos);
                 }
                 else if (needs.equals("nodelist")) {
                     System.out.println("send node list start!");
-                    Communicate.sendSomething(socket, Communicate.getNodeList());
+                    Communicate.sendSomething(socket, Communicate.getNodeList(), oos);
                 }
                 else if (needs.equals("sendblock")) {
-                    Object recv = Communicate.recvSomething(socket);
+                    Object recv = Communicate.recvSomething(socket, ois);
                     BlockChain.acceptBlock(recv);/*
                     if (BlockChain.acceptBlock(recv) == 0) {
                         Communicate.reqHandshaking(socket, "accept", pw, br);
@@ -70,6 +76,8 @@ public class Listen extends Thread {
                 }
                 pw.close();
                 br.close();
+                oos.close();
+                ois.close();
                 socket.close();
                 } catch (IOException e) {
                 // TODO Auto-generated catch block
