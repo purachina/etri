@@ -72,7 +72,7 @@ public class BlockChain extends Thread {
                     if (newblocks.get(0).getPreBlockHash().equals(cblock.getPreBlockHash()) && cblock.chkRecvBlock(newblocks.get(0))) {
                         blockchain.add(newblocks.get(0));
                         blockchain.add(newblocks.get(1));
-                        cblock = newblocks.get(1);
+                        cblock = blockchain.get(blockchain.size() - 1);
                         ret = 0;
                     }
                     else {
