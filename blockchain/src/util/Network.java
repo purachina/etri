@@ -49,6 +49,7 @@ public class Network {
         Socket socket;
         for (int i = 0; i < 3; i++) {
             try {
+                System.out.println("request blockchain to " + ip);
                 socket = makeSocket(ip);
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -64,6 +65,7 @@ public class Network {
                     }
                     if (recv instanceof ArrayList) {
                         if (((ArrayList) recv).get(0) instanceof Block) {
+                            System.out.println("blockchain received!!!");
                             return (ArrayList<Block>) recv;
                         }
                     }
@@ -71,6 +73,7 @@ public class Network {
             } catch (IOException e) {
                 if (e instanceof SocketException || e instanceof SocketTimeoutException) {
                     try {
+                        System.out.println("receiving blockchain has failed... will try again after 512mils");
                         Thread.sleep(512);
                     } catch (InterruptedException e1) {
                         // TODO Auto-generated catch block
@@ -80,6 +83,7 @@ public class Network {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            System.out.println("requesting blockchain has fatal error!!!");
         }
         return null;
     }
@@ -87,6 +91,7 @@ public class Network {
         for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
+                System.out.println("request block to " + ip);
                 socket = makeSocket(ip);
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -100,11 +105,16 @@ public class Network {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    if (recv instanceof Block) return (Block)recv;
+                    if (recv instanceof Block) {
+                        System.out.println("block received!!!");
+                        ((Block)recv).printBlock();
+                        return (Block)recv;
+                    } 
                 }
             } catch (IOException e) {
                 if (e instanceof SocketException || e instanceof SocketTimeoutException) {
                     try {
+                        System.out.println("receiving block has failed... will try again after 512mils");
                         Thread.sleep(512);
                     } catch (InterruptedException e1) {
                         // TODO Auto-generated catch block
@@ -114,6 +124,7 @@ public class Network {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            System.out.println("requesting block has fatal error!!!");
         }
         return null;
     }
@@ -121,6 +132,7 @@ public class Network {
         for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
+                System.out.println("request nodelist to " + ip);
                 socket = makeSocket(ip);
                 pw = new PrintWriter(socket.getOutputStream());
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -138,7 +150,7 @@ public class Network {
                     if (recv instanceof ArrayList) {
                         if (((ArrayList) recv).get(0) instanceof String) {
                             ArrayList<String> tmp = (ArrayList<String>) recv;
-                            System.out.println("this is received stuff");
+                            System.out.println("nodelist received!!!");
                             for (int j = 0; j < tmp.size(); j++)
                                 System.out.println(tmp.get(j));
                             return (ArrayList<String>) recv;
@@ -148,6 +160,7 @@ public class Network {
             } catch (IOException e) {
                 if (e instanceof SocketException || e instanceof SocketTimeoutException) {
                     try {
+                        System.out.println("receiving nodelist has failed... will try again after 512mils");
                         Thread.sleep(512);
                     } catch (InterruptedException e1) {
                         // TODO Auto-generated catch block
@@ -157,6 +170,7 @@ public class Network {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            System.out.println("requesting nodelist has fatal error!!!");
         }
         return null;
     }
@@ -164,6 +178,7 @@ public class Network {
         for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
+                System.out.println("request hash to " + ip);
                 socket = makeSocket(ip);
                 String ans = Communicate.reqHandshaking(socket, needs, pw, br);
                 if (ans.equals("OK")) {
@@ -177,6 +192,7 @@ public class Network {
                         e.printStackTrace();
                     }
                     if (recv instanceof String) {
+                        System.out.println("hash received!!!");
                         return (String) recv;
                     }
                 }
@@ -214,12 +230,12 @@ public class Network {
             this.needs = new String(needs);
         }
         public void run() {
+            System.out.println("request " + needs + " to target_ip");
             if (target_ip.equals(Communicate.myip)) return;
             System.out.println(target_ip + " " + needs);
             if (needs.contains("hash-")) {
                 recv = reqHash(target_ip, needs);
                 if (recv != null && recv instanceof String) {
-                    System.out.println((String)recv + " " + target_ip);
                     Consensus.addHash((String)recv, target_ip);
                 }
             }
@@ -242,6 +258,7 @@ public class Network {
 
         
     protected static int sendBlock(String ip, ArrayList<Block> newblocks) {
+        System.out.println("send block to " + ip);
         for (int i = 0; i < 3; i++) {
             Socket socket;
             try {

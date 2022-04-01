@@ -190,6 +190,7 @@ public class Block implements Serializable {
             synchronized (this) {
                 if (UserControl.closechk == true) return null;
                 if (this.getBlockHash().substring(0, difficulty.length()).compareTo(difficulty) <= 0) {
+                    System.out.println("block mined!!!");
                     time = System.currentTimeMillis() - time;
                     Block ret;
                     if (time < 6000) {
@@ -219,6 +220,7 @@ public class Block implements Serializable {
                     Consensus.initPoW();
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
                         if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
+                            System.our.println("distributing this block to " + Communicate.getNodeList().get(i));
                             DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i),
                                     new Block(this), new Block(ret));
                             dbt.start();

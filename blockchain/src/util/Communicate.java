@@ -80,6 +80,7 @@ public class Communicate {
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(o);
                 oos.flush();
+                System.out.println("Send " + o.getClass().getName() + " to " + newnode);
                 oos.close();
                 if (!node.contains(newnode)) {
                     synchronized(node) {
@@ -101,7 +102,6 @@ public class Communicate {
     protected static Object recvSomething(Socket socket) {
         Object recv_item = "";
         String ans;
-        System.out.println(socket.getInetAddress().getHostAddress());
         try {
                 /*PrintWriter pw = new PrintWriter(socket.getOutputStream());
                 BufferedReader br =
@@ -128,6 +128,7 @@ public class Communicate {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
         }
+        System.out.println("received " + recv_item.getClass().getName() + " from " + socket.getInetAddress().getHostAddress());
         if (recv_item.equals("")) System.out.println("System does not received anything");
         return recv_item;
     }
@@ -142,7 +143,7 @@ public class Communicate {
             }
             System.out.println(ans + "end");
             if (ans.equals("asdf")) {
-                System.out.println("Handshake authed");
+                System.out.println("Handshake answer authed");
                 pw.println("OK");
                 pw.flush();
                 ans = "";
@@ -150,14 +151,14 @@ public class Communicate {
                     ans = br.readLine();
                     if (ans.length() > 0) break;
                 }
-                System.out.println(ans);
+                System.out.println(ans + " gonna be sending");
             }
             return ans;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("AH error");
+        System.out.println("answer handshaking has an error");
         return ans;
     }
     protected static String reqHandshaking(Socket socket, String tar, PrintWriter pw, BufferedReader br) {
@@ -166,13 +167,13 @@ public class Communicate {
             pw.println("asdf");
             pw.flush();
             ans = "";
-            System.out.println(tar + " Handshaking...");
+            System.out.println("request " + tar + " Handshaking...");
             while(true) {
                 ans = br.readLine();
                 if (ans.length() > 0) break;
             }
             if (ans.equals("OK")) {
-                System.out.println(tar + " Handshake authed");
+                System.out.println(tar + " Handshake request authed");
                 pw.println(tar);
                 pw.flush();
             }
@@ -181,7 +182,8 @@ public class Communicate {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("RH error");
+        System.out.println("request handshaking has an error");
         return tar;
     }
+    
 }
