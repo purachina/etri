@@ -26,12 +26,7 @@ public class Listen extends Thread {
     public void run() {
         while (true) {
             try {
-                try {
-                    server_sock.setSoTimeout(1000);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    System.out.println("asdf");
-                }
+                server_sock.setSoTimeout(1000);
                 socket = server_sock.accept();
                 socket.setSoTimeout(10000);
                 pw = new PrintWriter(socket.getOutputStream());
