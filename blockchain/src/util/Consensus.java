@@ -57,13 +57,13 @@ public class Consensus {
         neg++;
     }
     public static boolean chkPoW() {
-        return true;
+        return true;/*
         while(true) {
             if (aff + neg == Communicate.getNodeList().size() - 1) {
                 if (aff >= neg) return true;
                 return false;
             }
-        }
+        }*/
     }
     public static int addHash(String newhash, String owner) {
         synchronized(network_hash) {
