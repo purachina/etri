@@ -74,7 +74,10 @@ public class BlockChain extends Thread {
                         cblock = newblocks.get(1);
                         ret = 0;
                     }
-                    else {System.out.println("##########################");}
+                    else {
+                        System.out.println("##########################");
+                        newblocks.get(0).printBlock();
+                    }
                 }
             }
         }
