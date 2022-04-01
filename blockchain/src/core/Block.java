@@ -220,7 +220,7 @@ public class Block implements Serializable {
                     Consensus.initPoW();
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
                         if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
-                            System.our.println("distributing this block to " + Communicate.getNodeList().get(i));
+                            System.out.println("distributing this block to " + Communicate.getNodeList().get(i));
                             DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i),
                                     new Block(this), new Block(ret));
                             dbt.start();
