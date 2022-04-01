@@ -278,7 +278,7 @@ public class Network {
                 String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
                 if (ans.equals("OK")) {
                     Communicate.sendSomething(socket, newblocks, oos);
-                    socket = makeSocket(ip);
+                    /*socket = makeSocket(ip);
                     ans = Communicate.ansHandshaking(socket, pw, br);
                     if (ans.equals("accept")) {
                         System.out.println(socket.getInetAddress().getHostAddress() + " says yes");
@@ -287,7 +287,7 @@ public class Network {
                     else if (ans.equals("no")) {
                         Consensus.powDeny();
                         System.out.println(socket.getInetAddress().getHostAddress() + " says no");
-                    }
+                    }*/
                     try {
                         pw.close();
                         br.close();
