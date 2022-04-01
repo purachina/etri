@@ -266,6 +266,7 @@ public class Network {
                 String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
                 if (ans.equals("OK")) {
                     Communicate.sendSomething(socket, newblocks);
+                    socket = makeSocket(ip);
                     ans = Communicate.ansHandshaking(socket, pw, br);
                     if (ans.equals("accept")) {
                         System.out.println(socket.getInetAddress().getHostAddress() + " says yes");
