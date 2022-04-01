@@ -107,11 +107,13 @@ public class BlockChain extends Thread {
         while(true) {
             Transaction coinbase_tx = new Transaction(Communicate.myip, Communicate.myip, "123");
             while(true) {
+                cblock = blockchain.get(blockchain.size() - 1);
+                cblock.addnonce();
                 synchronized (cblock) {
-                    cblock = blockchain.get(blockchain.size() - 1);
                     if (UserControl.closechk == true) return;
                     if (cblock.getBlockHash().substring(0, cblock.getDifficulty().length()).compareTo(cblock.getDifficulty()) <= 0) {
                         System.out.println("block mined!!!");
+                        cblock.printBlock();
                         Block newblock = new Block(cblock, cblock.getBlockID() + 1, 0, coinbase_tx, "00000");
                         
                         for (int i = 0; i < Communicate.getNodeList().size(); i++) {
@@ -120,10 +122,9 @@ public class BlockChain extends Thread {
                                 DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i), new Block(cblock), new Block(newblock));
                                 dbt.start();
                             }
-                            blockchain.add(newblock);
                         }
+                        blockchain.add(newblock);
                     }
-                    cblock.addnonce();
                 }
             }
         }
