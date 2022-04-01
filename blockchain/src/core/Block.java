@@ -190,7 +190,7 @@ public class Block implements Serializable {
             this.refresh();
         }
     }
-
+    public void addnonce() {this.nonce++;}
     public Block mine(Transaction coinbase_tx) {
         //long time = System.currentTimeMillis();
         while (true) {

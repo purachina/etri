@@ -123,6 +123,7 @@ public class BlockChain extends Thread {
                             blockchain.add(newblock);
                         }
                     }
+                    cblock.addnonce();
                 }
             }
         }
