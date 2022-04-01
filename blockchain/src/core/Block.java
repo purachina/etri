@@ -220,11 +220,13 @@ public class Block implements Serializable {
                     for (int i = 0; i < Communicate.getNodeList().size(); i++) {
                         if (!Communicate.getNodeList().get(i).equals(Communicate.myip)) {
                             DistributeBlockThread dbt = new DistributeBlockThread(Communicate.getNodeList().get(i),
-                                    this, ret);
+                                    new Block(this), new Block(ret));
                             dbt.start();
                         }
                     }
-                    if (Consensus.chkPoW()) return ret;
+                    while (true) {
+                        if (Consensus.chkPoW()) return ret;
+                    }
                 }
                 nonce++;
             }

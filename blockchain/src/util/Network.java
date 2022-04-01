@@ -47,7 +47,7 @@ public class Network {
     }
     protected static ArrayList<Block> reqBlockchain(String ip) {
         Socket socket;
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             try {
                 socket = makeSocket(ip);
                 pw = new PrintWriter(socket.getOutputStream());
@@ -84,7 +84,7 @@ public class Network {
         return null;
     }
     protected static Block reqBlock(String ip) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
                 socket = makeSocket(ip);
@@ -118,7 +118,7 @@ public class Network {
         return null;
     }
     protected static ArrayList<String> reqNodeList(String ip) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
                 socket = makeSocket(ip);
@@ -161,7 +161,7 @@ public class Network {
         return null;
     }
     protected static String reqHash(String ip, String needs) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             Socket socket;
             try {
                 socket = makeSocket(ip);
@@ -242,55 +242,53 @@ public class Network {
 
         
     protected static int sendBlock(String ip, ArrayList<Block> newblocks) {
-        synchronized(newblocks) {
-            for (int i = 0; i < 2; i++) {
-                Socket socket;
-                try {
-                    socket = makeSocket(ip);
-                    String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
-                    if (ans.equals("OK")) {
-                        Communicate.sendSomething(socket, newblocks);
-                        ans = Communicate.ansHandshaking(socket, pw, br);
-                        if (ans.equals("accept")) {
-                            System.out.println(socket.getInetAddress().getHostAddress() + " says yes");
-                            Consensus.powAccept();
-                        }
-                        else if (ans.equals("no")) {
-                            Consensus.powDeny();
-                            System.out.println(socket.getInetAddress().getHostAddress() + " says no");
-                        }
-                        try {
-                            pw.close();
-                            br.close();
-                            socket.close();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        return 0;
+        for (int i = 0; i < 3; i++) {
+            Socket socket;
+            try {
+                socket = makeSocket(ip);
+                String ans = Communicate.reqHandshaking(socket, "sendblock", pw, br);
+                if (ans.equals("OK")) {
+                    Communicate.sendSomething(socket, newblocks);
+                    ans = Communicate.ansHandshaking(socket, pw, br);
+                    if (ans.equals("accept")) {
+                        System.out.println(socket.getInetAddress().getHostAddress() + " says yes");
+                        Consensus.powAccept();
                     }
-                    else {
-                        try {
-                            pw.close();
-                            br.close();
-                            socket.close();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                    else if (ans.equals("no")) {
+                        Consensus.powDeny();
+                        System.out.println(socket.getInetAddress().getHostAddress() + " says no");
                     }
-                } catch (IOException e) {
-                    if (e instanceof SocketException || e instanceof SocketTimeoutException) {
-                        try {
-                            Thread.sleep(512);
-                        } catch (InterruptedException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
+                    try {
+                        pw.close();
+                        br.close();
+                        socket.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    return 0;
                 }
+                else {
+                    try {
+                        pw.close();
+                        br.close();
+                        socket.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                if (e instanceof SocketException || e instanceof SocketTimeoutException) {
+                    try {
+                        Thread.sleep(512);
+                    } catch (InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
         return 1;
