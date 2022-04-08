@@ -47,9 +47,9 @@ public class BlockChain {
     public static int printBlockChain(String bcid) {
         synchronized(blockchaindict) {
             if (!blockchaindict.containsKey(bcid)) return 0;
-            setWorkspace(bcid);
-            for (int i = 0; i < blockchain.size(); i++) {
-                blockchain.get(i).printBlock();
+            System.out.println(bcid + "th blockchain");
+            for (int i = 0; i < blockchaindict.get(bcid).size(); i++) {
+                blockchaindict.get(bcid).get(i).printBlock();
             }
         }
         return 0;
