@@ -41,6 +41,7 @@ public class SimulateManu extends Thread {
                     BlockChain.mine(Integer.toString(bcid));
                     bcid++;
                     BlockChain.setWorkspace(Integer.toString(bcid));
+                    Communicate.addNode(Integer.toString(bcid), Communicate.myip);
                 }
             }
         }
