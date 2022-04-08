@@ -35,7 +35,7 @@ public class SimulateManu extends Thread {
                 LocalDateTime now = LocalDateTime.now();
                 Random rand = new Random();
                 int r = rand.nextInt(30);
-                Transaction tx = new Transaction("Time: " + now.toString() + " Measure: " + r);
+                Transaction tx = new Transaction(Communicate.myip + " Time: " + now.toString() + " Measure: " + r);
                 BlockChain.addTX(tx);
                 if (r >= 20) {
                     BlockChain.mine(Integer.toString(bcid));
