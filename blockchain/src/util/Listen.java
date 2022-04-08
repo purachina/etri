@@ -40,41 +40,44 @@ public class Listen extends Thread {
                 System.out.println(socket.getInetAddress().getHostAddress());
                 String needs = Communicate.ansHandshaking(socket, pw, br);
                 System.out.println("sending...");
+                String bcid = needs.split("-")[0];
                 if (needs.contains("hash-")) {
-                    needs = needs.split("-")[1];
+                    needs = needs.split("-")[2];
                     if (needs.equals("blockchain")) {
-                        Communicate.sendSomething(socket, Hashing.makeHash(BlockChain.getBlockChain()), oos);
-                        System.out.println(Hashing.makeHash(BlockChain.getBlockChain()));
+                        Communicate.sendSomething(socket, bcid, Hashing.makeHash(BlockChain.getBlockChain(bcid)), oos);
                     }
                     else if (needs.equals("block")) {
-                        Communicate.sendSomething(socket, BlockChain.getCurrentBlock().getBlockHash(), oos);
+                        Communicate.sendSomething(socket, bcid, BlockChain.getCurrentBlock(bcid).getBlockHash(), oos);
                     }
                     else if (needs.equals("nodelist")) {
-                        Communicate.sendSomething(socket, Hashing.makeHash(Communicate.getNodeList()), oos);
+                        Communicate.sendSomething(socket, bcid, Hashing.makeHash(Communicate.getNodeList(bcid)), oos);
                     }
                 }
-                else if (needs.equals("blockchain")) {
-                    Communicate.sendSomething(socket, BlockChain.getBlockChain(), oos);
-                }
-                else if (needs.equals("block")) {
-                    Communicate.sendSomething(socket, BlockChain.getCurrentBlock(), oos);
-                }
-                else if (needs.equals("nodelist")) {
-                    System.out.println("send node list start!");
-                    Communicate.sendSomething(socket, Communicate.getNodeList(), oos);
-                }
-                else if (needs.equals("sendblock")) {
-                    Object recv = Communicate.recvSomething(socket, ois);
-                    BlockChain.acceptBlock(recv);
-                    /*
-                    if (BlockChain.acceptBlock(recv) == 0) {
-                        Communicate.reqHandshaking(socket, "accept", pw, br);
+                else {
+                    needs = needs.split("-")[1];
+                    if (needs.equals("blockchain")) {
+                        Communicate.sendSomething(socket, bcid, BlockChain.getBlockChain(bcid), oos);
                     }
-                    else Communicate.reqHandshaking(socket, "no", pw, br);
-                    */
-                }
-                else if (needs.equals("sendtx")) {
-
+                    else if (needs.equals("block")) {
+                        Communicate.sendSomething(socket, bcid, BlockChain.getCurrentBlock(bcid), oos);
+                    }
+                    else if (needs.equals("nodelist")) {
+                        System.out.println("send node list start!");
+                        Communicate.sendSomething(socket, bcid, Communicate.getNodeList(bcid), oos);
+                    }
+                    else if (needs.equals("sendblock")) {
+                        Object recv = Communicate.recvSomething(socket, ois);
+                        BlockChain.acceptBlock(bcid, recv);
+                        /*
+                        if (BlockChain.acceptBlock(recv) == 0) {
+                            Communicate.reqHandshaking(socket, "accept", pw, br);
+                        }
+                        else Communicate.reqHandshaking(socket, "no", pw, br);
+                        */
+                    }
+                    else if (needs.equals("sendtx")) {
+    
+                    }
                 }
                 pw.close();
                 br.close();

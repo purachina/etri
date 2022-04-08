@@ -9,26 +9,60 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import core.Block;
 import core.Transaction;
 
 public class Communicate {
-    private static ArrayList<String> node = new ArrayList<String>();
+    //private static ArrayList<String> node = new ArrayList<String>();
+    private static HashMap<String, ArrayList<String>> nodedict = new HashMap<String, ArrayList<String>>();
+    private static ArrayList<String> node;
     public static String myip;
-    private static ArrayList<String> recv_hash = new ArrayList<String>();
-    protected static int removeNode(String target) {
+    private static void setWorkspace(String bcid) {
+        if (nodedict == null) {
+            nodedict = new HashMap<String, ArrayList<String>>();
+        }
+        if (nodedict.containsKey(bcid)) {
+            node = nodedict.get(bcid);
+        }
+        else {
+            node = new ArrayList<String>();
+            nodedict.put(bcid, node);
+        }
+    }
+    /*protected static int removeNode(String target) {
         synchronized(node) {
             node.remove(target);
         }
         return 0;
-    }
+    }*/
+    protected static int addNode(String bcid, String targetip) {
+        synchronized(nodedict) {
+            setWorkspace(bcid);
+            node.add(new String(targetip));
+        }
+        return 0;
+    }/*
     protected static int addNode(String target) {
         synchronized(node) {
+            setWorkspace(bcid);
             if (node == null) node = new ArrayList<String>();
             node.add(new String(target));
         }
         return 0;
-    }
+    }*/
+    protected static int setNodeDict(String bcid, ArrayList<String> recv) {
+        synchronized(nodedict) {
+            if (nodedict == null) {
+                nodedict = new HashMap<String, ArrayList<String>>();
+            }
+            ArrayList<String> tmp = new ArrayList<String>();
+            for (int i = 0; i < recv.size(); i++) tmp.add(recv.get(i));
+            nodedict.put(bcid, tmp);
+        }
+        return 0;
+    }/*
     protected static int setNodeList(ArrayList<String> target) {
         synchronized(node) {
             if (node == null) node = new ArrayList<String>();
@@ -38,23 +72,48 @@ public class Communicate {
             }
         }
         return 0;
+    }*/
+    protected static int loadNodeDict(HashMap<String, ArrayList<String>> newnd) {
+        synchronized(nodedict) {
+            String [] bcids = newnd.keySet().toArray(new String[newnd.size()]);
+            for (int i = 0; i < bcids.length; i++) {
+                setNodeDict(bcids[i], newnd.get(bcids[i]));
+            }
+        }
+        return 0;
     }
-    public static ArrayList<String> getNodeList() {
-        ArrayList<String> tmp = new ArrayList<String>();
-        synchronized(node) {
+    public static ArrayList<String> getNodeList(String bcid) {
+        ArrayList<String> tmp = null;
+        synchronized(nodedict) {
+            setWorkspace(bcid);
+            tmp = new ArrayList<String>();
             for (int i = 0; i < node.size(); i++) {
                 tmp.add(node.get(i));
             }
         }
         return tmp;
     }
-    public static int printNodeList() {
-        for (int i = 0; i < node.size(); i++) {
-            System.out.println(node.get(i));
+    public static HashMap<String, ArrayList<String>> getNodeDict() {
+        HashMap<String, ArrayList<String>> ret = null;
+        synchronized(nodedict) {
+            ret = new HashMap<String, ArrayList<String>>();
+            String [] bcids = nodedict.keySet().toArray(new String[nodedict.size()]);
+            for (int i = 0; i < bcids.length; i++) {
+                ret.put(bcids[i], nodedict.get(bcids[i]));
+            }
+        }
+        return ret;
+    }
+    public static int printNodeList(String bcid) {
+        synchronized(nodedict) {
+            setWorkspace(bcid);
+            for (int i = 0; i < node.size(); i++) {
+                System.out.println(node.get(i));
+            }
         }
         return 0;
     }
-    protected static int sendSomething(Socket socket, Object o, ObjectOutputStream oos) {
+    protected static int sendSomething(Socket socket, String bcid, Object o, ObjectOutputStream oos) {
         try {
             String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
             String ans;
@@ -80,10 +139,9 @@ public class Communicate {
                 oos.writeObject(o);
                 oos.flush();
                 System.out.println("Send " + o.getClass().getName() + " to " + newnode);
-                if (!node.contains(newnode)) {
-                    synchronized(node) {
-                        node.add(newnode);
-                    }
+                synchronized(nodedict) {
+                    setWorkspace(bcid);
+                    if (!node.contains(newnode)) node.add(newnode);
                 }
                 return 0;
             }

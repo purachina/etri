@@ -19,7 +19,7 @@ public class Block implements Serializable {
         this.blockid = 0;
         this.nonce = 0;
         this.merkletree = new MerkleTree(new Transaction());
-        this.difficulty = "0";
+        this.difficulty = "000";
         this.timestamp = 0;
         this.available = true;
         this.refresh();
@@ -50,6 +50,16 @@ public class Block implements Serializable {
             }
             else {this.available = true;}
         }
+    }
+    public Block(String s) {
+        this.pre_block_hash = null;
+        this.blockid = 0;
+        this.nonce = 0;
+        this.merkletree = new MerkleTree(new Transaction(s));
+        this.difficulty = "000";
+        this.timestamp = 0;
+        this.available = true;
+        this.refresh();
     }
     public String getPreBlockHash() {
         if (this.pre_block_hash != null) return new String(this.pre_block_hash);
@@ -99,6 +109,13 @@ public class Block implements Serializable {
             this.merkleroot = this.merkletree.getMerkleRoot();
         }
         return 0;
+    }
+    public String getCoinbaseTX() {
+        String ret = "";
+        synchronized(this) {
+            ret = this.getTXList().get(0).getInfo();
+        }
+        return ret;
     }
     private int setMerkleTree(MerkleTree newmt) {
         synchronized(this) {
@@ -191,6 +208,7 @@ public class Block implements Serializable {
         }
     }
     public void addnonce() {this.nonce++;}
+    /*
     public Block mine(Transaction coinbase_tx) {
         //long time = System.currentTimeMillis();
         while (true) {
@@ -200,7 +218,6 @@ public class Block implements Serializable {
                     System.out.println("block mined!!!");
                     //time = System.currentTimeMillis() - time;
                     Block ret;
-                    /*
                     if (time < 6000) {
                         ret = new Block(
                                 this,
@@ -224,7 +241,7 @@ public class Block implements Serializable {
                                 this.getNonce(),
                                 coinbase_tx,
                                 this.getDifficulty());
-                    }*/
+                    }
                     ret = new Block(
                                 this,
                                 this.getBlockID() + 1,
@@ -247,5 +264,5 @@ public class Block implements Serializable {
                 nonce++;
             }
         }
-    }
+    }*/
 }

@@ -12,15 +12,28 @@ public class UserControl extends Thread {
         System.out.println("Where is server?");
         return sc.nextLine();
     }
+    public static String getBCID() {
+        System.out.println("Enter the Blockchain ID");
+        return sc.nextLine();
+    }
+    public static boolean isManu() {
+        System.out.println("Are you Manufacturer? Y/N");
+        String ans = sc.nextLine();
+        if (ans.equals("Y") || ans.equals("y")) return true;
+        return false;
+    }
     public void run() {
         while (true) {
             String payer, payee, amount, ans = "";
             System.out.println("\n\nCheck the blockchain: chk\nAdd the transaction: add\nClose the Program: cls\nSave this blockchain: save");
             ans = sc.next();
             if (ans.equals("chk")) {
-                BlockChain.printBlockChain();
-                Communicate.printNodeList();
-            }
+                System.out.println("Enter the Blockchain ID");
+                System.out.println(BlockChain.getBCDict().keySet());
+                ans = sc.next();
+                BlockChain.printBlockChain(ans);
+                Communicate.printNodeList(ans);
+            }/*
             else if (ans.equals("add")) {
                 System.out.print("Payer: ");
                 payer = sc.next();
@@ -30,14 +43,14 @@ public class UserControl extends Thread {
                 amount = sc.next();
                 Transaction tx = new Transaction(payer, payee, amount);
                 BlockChain.addTX(tx);
-            } 
+            } */
             else if (ans.equals("cls")) {
                 closechk = true;
                 sc.close();
                 return;
             }
             else if (ans.equals("save")) {
-                SerialIO.savebin(BlockChain.getBlockChain(), Communicate.getNodeList());
+                SerialIO.savebin(BlockChain.getBCDict(), Communicate.getNodeDict());
             }
         }
     }
