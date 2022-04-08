@@ -129,7 +129,7 @@ public class BlockChain {
                 if (((ArrayList)recv).get(0) instanceof Block && ((ArrayList)recv).get(1) instanceof Block) {
                     ArrayList<Block> newblocks = (ArrayList<Block>) recv;
                     if (newblocks.get(0).getPreBlockHash().equals(blockchaindict.get(bcid).get(blockchaindict.get(bcid).size() - 1).getPreBlockHash()) && blockchaindict.get(bcid).get(blockchaindict.get(bcid).size() - 1).chkRecvBlock(newblocks.get(0))) {
-                        blockchaindict.get(bcid).remove(blockchain.size() - 1);
+                        blockchaindict.get(bcid).remove(blockchain.blockchaindict.get(bcid).size() - 1);
                         blockchaindict.get(bcid).add(newblocks.get(0));
                         blockchaindict.get(bcid).add(newblocks.get(1));
                         ret = 0;
