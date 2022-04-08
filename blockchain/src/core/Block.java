@@ -194,8 +194,14 @@ public class Block implements Serializable {
 
     public boolean chkRecvBlock(Block recv) {
         recv.refresh();
-        if (!recv.getDifficulty().equals(this.getDifficulty())) return false;
-        if (recv.getBlockHash().substring(0, this.getDifficulty().length()).compareTo(this.getDifficulty()) <= 0) return true;
+        if (!recv.getDifficulty().equals(this.getDifficulty())) {
+            System.out.println("Difficulty is diffrenet");
+            return false;
+        }
+        if (recv.getBlockHash().substring(0, this.getDifficulty().length()).compareTo(this.getDifficulty()) <= 0) {
+            return true;
+        }
+        System.out.println(recv.getBlockHash());
         return false;
     }
 
