@@ -117,6 +117,10 @@ public class Communicate {
         try {
             String newnode = ((InetSocketAddress)socket.getRemoteSocketAddress()).getAddress().getHostAddress();
             String ans;
+            synchronized(nodedict) {
+                setWorkspace(bcid);
+                if (!node.contains(newnode)) node.add(newnode);
+            }
             if (o instanceof Block || o instanceof Transaction || o instanceof String || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof Block || o instanceof ArrayList && ((ArrayList)o).get(0) instanceof String) {
                 /*PrintWriter pw = new PrintWriter(socket.getOutputStream());BufferedReader br =
                 new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -139,10 +143,6 @@ public class Communicate {
                 oos.writeObject(o);
                 oos.flush();
                 System.out.println("Send " + o.getClass().getName() + " to " + newnode);
-                synchronized(nodedict) {
-                    setWorkspace(bcid);
-                    if (!node.contains(newnode)) node.add(newnode);
-                }
                 return 0;
             }
             else {
