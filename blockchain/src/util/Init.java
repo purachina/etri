@@ -89,6 +89,8 @@ public class Init {
             System.out.println(recvbchash);
             if (netres.equals(recvbchash)) {
                 BlockChain.acceptBlockChain(reqid, tmpbc);
+                SimulateServ ss = new SimulateServ();
+                ss.run();
             }
             else {
                 System.out.println("this server is lier");
