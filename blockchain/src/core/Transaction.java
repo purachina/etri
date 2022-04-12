@@ -6,7 +6,7 @@ import util.Hashing;
 
 public class Transaction implements Serializable{
     
-    private String payer, payee, amount;
+    public String payer, payee, amount;
     
     public Transaction(String newpayer, String newpayee, String newamount) {
         payer = new String(newpayer);

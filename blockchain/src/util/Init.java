@@ -93,6 +93,7 @@ public class Init {
                         BlockChain.acceptBlockChain(reqid, tmpbc);
                         SimulateServ ss = new SimulateServ();
                         ss.run();
+                        return 0;
                     }
                     else {
                         System.out.println("this server is lier");

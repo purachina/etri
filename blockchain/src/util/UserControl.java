@@ -25,7 +25,7 @@ public class UserControl extends Thread {
     public void run() {
         while (true) {
             String payer, payee, amount, ans = "";
-            System.out.println("\n\nCheck the blockchain: chk\nAdd the transaction: add\nClose the Program: cls\nSave this blockchain: save");
+            System.out.println("\n\nCheck the blockchain: chk\nHack the transaction: hack\nClose the Program: cls\nSave this blockchain: save");
             ans = sc.next();
             if (ans.equals("chk")) {
                 System.out.println("Enter the Blockchain ID");
@@ -48,6 +48,15 @@ public class UserControl extends Thread {
                 closechk = true;
                 sc.close();
                 return;
+            }
+            else if (ans.equals("hack")) {
+                System.out.println("Enter the Blockchain ID");
+                System.out.println(BlockChain.getBCDict().keySet());
+                String bcid = sc.next();
+                System.out.println("Enter the Block ID");
+                BlockChain.printBlockChain(bcid);
+                String bid = sc.next();
+                Hack.hack(bcid, bid);
             }
             else if (ans.equals("save")) {
                 SerialIO.savebin(BlockChain.getBCDict(), Communicate.getNodeDict());

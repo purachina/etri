@@ -11,7 +11,7 @@ import util.Network.DistributeBlockThread;
 
 public class Block implements Serializable {
     private String pre_block_hash, blockhash, merkleroot, difficulty;
-    private MerkleTree merkletree;
+    public MerkleTree merkletree;
     private int blockid, nonce, timestamp;
     private boolean available;
     public Block() {

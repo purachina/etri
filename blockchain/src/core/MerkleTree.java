@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import util.Hashing;
 
 public class MerkleTree implements Serializable {
-    private ArrayList<Transaction> txlist;
+    public ArrayList<Transaction> txlist;
     protected ArrayList<String> merklelist;
     public MerkleTree(Transaction coinbase_tx) {
         this.initMerkleTree(coinbase_tx);
