@@ -95,7 +95,7 @@ public class BlockChain {
             ArrayList<Block> tmpbc = new ArrayList<Block>();
             for (int i = 0; i < newbc.size(); i++) {
                 tmpblock = new Block(newbc.get(i));
-                if (!tmpblock.getAvailable() || i < newbc.size() - 1 && tmpblock.pow() || i > 0 && tmpblock.getPreBlockHash().equals(newbc.get(i - 1).getBlockHash())) {
+                if (!(tmpblock.getAvailable()) || (i < newbc.size() - 1 && !tmpblock.pow()) || (i > 0 && !tmpblock.getPreBlockHash().equals(newbc.get(i - 1).getBlockHash()))) {
                     System.out.println("This server is lier");
                     UserControl.closechk = true;
                     return 1;
