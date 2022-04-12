@@ -187,7 +187,10 @@ public class Block implements Serializable {
         }
         return ret;
     }
-
+    public boolean pow() {
+        if (this.getBlockHash().substring(0, this.getDifficulty().length()).compareTo(this.getDifficulty()) <= 0) return true;
+        return false;
+    }
     public boolean equals(Block target) {
         return target.getBlockHash().equals(this.getBlockHash());
     }
