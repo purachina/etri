@@ -95,10 +95,16 @@ public class BlockChain {
             ArrayList<Block> tmpbc = new ArrayList<Block>();
             for (int i = 0; i < newbc.size(); i++) {
                 tmpblock = new Block(newbc.get(i));
-                if (!tmpblock.getAvailable()) {
+                if (!tmpblock.getAvailable() || i < newbc.size() - 1 && tmpblock.pow() || i > 0 && tmpblock.getPreBlockHash().equals(newbc.get(i - 1).getBlockHash())) {
+                    System.out.println("this server is lier");
+                    UserControl.closechk = true;
                     return 1;
                 }
-                else tmpbc.add(tmpblock);
+                else {
+                    tmpblock.printBlock();
+                    System.out.println("This block is good");
+                    tmpbc.add(tmpblock);
+                }
             }
             blockchaindict.put(bcid, tmpbc);
             setWorkspace(bcid);
@@ -166,7 +172,7 @@ public class BlockChain {
             synchronized (cblock) {
                 cblock.addnonce();
                 if (UserControl.closechk == true) return 0;
-                if (cblock.getBlockHash().substring(0, cblock.getDifficulty().length()).compareTo(cblock.getDifficulty()) <= 0) {
+                if (cblock.pow()) {
                     Block newblock = new Block(cblock, cblock.getBlockID() + 1, 0, coinbase_tx, "0000");
                     ArrayList<String> network = Communicate.getNodeList(bcid);
                     for (int i = 0; i < network.size(); i++) {
