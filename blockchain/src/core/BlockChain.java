@@ -101,8 +101,6 @@ public class BlockChain {
                     return 1;
                 }
                 else {
-                    tmpblock.printBlock();
-                    System.out.println("This block is good");
                     tmpbc.add(tmpblock);
                 }
             }

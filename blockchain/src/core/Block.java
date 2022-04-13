@@ -152,7 +152,7 @@ public class Block implements Serializable {
     }
     public int printBlock() {
         synchronized (this) {
-            this.refresh();
+            //this.refresh();
             ArrayList<Transaction> tmptxlist = this.merkletree.getTXList();
             System.out.println("Pre_block_hash = " + this.getPreBlockHash());
             System.out.println("Block ID = " + this.getBlockID());
@@ -163,7 +163,7 @@ public class Block implements Serializable {
             for (int i = 0; i < tmptxlist.size(); i++) {
                 tmptxlist.get(i).printTX();
             }
-            System.out.println("Block hash = " + this.getBlockHash());
+            System.out.println("Block hash = " + this.blockhash);
         }
         System.out.println("============================================");
         return 0;
