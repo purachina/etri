@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -13,22 +14,15 @@ import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 public class test {
-    public static void test(Object o1, Object o2) {
-        System.out.println(o1 == o2);
-        System.out.println(o1);
-        System.out.println(o2);
-        ((TO)o1).a = "zxcv";
-        System.out.println(o1 + ((TO)o1).a);
-        System.out.println(o2 + ((TO)o2).a);
-    }
-    public static class TO {
-        String a;
-        public TO() {a = "asdf";}
-    }
-    public static HashMap<String, String> asdf;
     public static void main(String args[]) {
-        TO o1 = new TO();
-        test(o1, o1);
-        System.out.println(o1.a);
+        try {
+            ServerSocket ss = new ServerSocket(111222);
+            Socket sock = ss.accept();
+            BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            System.out.println(br.readLine());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
